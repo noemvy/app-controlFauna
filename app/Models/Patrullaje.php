@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Patrullaje extends Model
 {
     protected $fillable = ['aerodromo_id', 'users_id', 'inicio', 'fin'];
+    protected $table = 'patrullaje';
 
     //Relacion con Aerodromo
         public function aerodromo()

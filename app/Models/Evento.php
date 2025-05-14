@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Evento extends Model
 {
-    protected $fillable = ['aerodromo_id', 'users_id', 'tipo_evento', 'comentario'];
-
+    protected $fillable = ['aerodromo_id', 'user_id', 'tipo_evento', 'comentario'];
+    protected $table = 'evento';
     //Relacion con Aerodromo
         public function aerodromo()
     {
