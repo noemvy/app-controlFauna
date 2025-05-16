@@ -71,10 +71,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-
+         Schema::dropIfExists('transferencias_municiones');
         Schema::dropIfExists('movimiento_inventario');
         Schema::dropIfExists('inventario_municiones');
         Schema::dropIfExists('catalogo_inventarios');
-        Schema::dropIfExists('transferencias_municiones');
+        
     }
 };

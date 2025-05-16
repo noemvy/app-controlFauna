@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('nombre_comun');
             $table->string('nombre_cientifico');
             $table->string('familia');
+            $table->string('rango_peligrosidad');
             $table->json('foto');
             $table->timestamps();
         });

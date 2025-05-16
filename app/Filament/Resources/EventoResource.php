@@ -32,7 +32,7 @@ class EventoResource extends Resource
                 ->required(),
 
             // Selección del usuario
-             Forms\Components\Select::make('user_id')
+            Forms\Components\Select::make('user_id')
                 ->label('Usuario')
                 ->options(User::pluck('name', 'id'))
                 ->required()

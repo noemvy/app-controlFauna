@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
         AtractivosSeeder::class,
         GrupoSeeder::class,
         CatalogoInventarioSeeder::class,
+        EspeciesSeeder::class,
 
     ]);
 }

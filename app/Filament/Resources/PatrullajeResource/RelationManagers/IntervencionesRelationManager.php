@@ -1,13 +1,10 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\PatrullajeResource\RelationManagers;
 
-use App\Filament\Resources\IntervencionesResource\Pages;
-use App\Filament\Resources\IntervencionesResource\RelationManagers;
-use App\Models\Intervenciones;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Resources\Resource;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -20,13 +17,11 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\BooleanColumn;
 use Filament\Forms\Components\Textarea;
 
-class IntervencionesResource extends Resource
+class IntervencionesRelationManager extends RelationManager
 {
-    protected static ?string $model = Intervenciones::class;
+    protected static string $relationship = 'intervenciones';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -93,19 +88,25 @@ class IntervencionesResource extends Resource
 
             Textarea::make('comentarios')->label('Comentarios')->nullable(),
         ]);
+
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
+            ->recordTitleAttribute('intervenciones')
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('intervenciones'),
             ])
             ->filters([
                 //
             ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make(),
+            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -114,19 +115,6 @@ class IntervencionesResource extends Resource
             ]);
     }
 
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
+    
 
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListIntervenciones::route('/'),
-            'create' => Pages\CreateIntervenciones::route('/create'),
-            'edit' => Pages\EditIntervenciones::route('/{record}/edit'),
-        ];
-    }
 }

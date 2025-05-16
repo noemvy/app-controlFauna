@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Patrullaje extends Model
 {
-    protected $fillable = ['aerodromo_id', 'users_id', 'inicio', 'fin'];
+    protected $fillable = ['aerodromo_id', 'user_id', 'estado','inicio', 'fin'];
     protected $table = 'patrullaje';
 
     //Relacion con Aerodromo
@@ -20,6 +20,16 @@ class Patrullaje extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+//     public function intervenciones()
+// {
+//     return $this->morphMany(Intervenciones::class, 'reportable');
+// }
+
+public function intervenciones()
+{
+    return $this->hasMany(Intervenciones::class);
+}
 
 
 }
