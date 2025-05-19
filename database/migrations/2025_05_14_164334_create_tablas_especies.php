@@ -22,11 +22,10 @@ return new class extends Migration
         Schema::create('especies', function (Blueprint $table) {
             $table->id();
             $table->foreignId('grupos_id')->constrained('grupos')->onDelete('cascade');
-            $table->string('nombre_comun');
-            $table->string('nombre_cientifico');
-            $table->string('familia');
-            $table->string('rango_peligrosidad');
-            $table->json('foto');
+            $table->string('nombre_comun')->nullable();
+            $table->string('nombre_cientifico')->nullable();
+            $table->string('rango_peligrosidad')->nullable();
+            $table->json('foto')->nullable();
             $table->timestamps();
         });
     }
