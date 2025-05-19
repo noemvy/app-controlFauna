@@ -12,11 +12,20 @@ class DeleteDataSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('grupos')->whereIn('nombre', [
-            'Reptiles',
-            'Aves',
-            'Mamíferos',
+        DB::table('acciones')->whereIn('nombre', [
+            'Monitoreo',
+            'Captura',
+            'Dispercion',
+            'Captura',
+            'Monitore',
+        ])->delete();
 
+        DB::table('acciones')->whereIn('nombre', [
+            'Monitoreo',
+            'Captura',
+            'Dispercion',
+            'Captura',
+            'Monitore',
         ])->delete();
     }
 }
