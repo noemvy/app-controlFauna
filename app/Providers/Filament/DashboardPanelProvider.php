@@ -28,11 +28,50 @@ class DashboardPanelProvider extends PanelProvider
             ->path('dashboard')
             ->login()
             ->favicon(asset('images/favicon.png'))
-            ->brandLogo(asset('images/logo-tocumen.png'))
-            ->brandLogoHeight('70px')
+            ->brandLogo(asset('images/logo-fauna.png'))
+            ->brandLogoHeight('60px')
             ->colors([
-                'primary' => Color::Blue,
+                'primary' => Color::Lime
             ])
+            ->darkMode(false)
+            ->renderHook('panels::body.start', fn()=>'
+            <style>
+                .fi-sidebar{
+                background-color:#90d652;
+                }
+
+                /*-------- -----------Sidebar: texto de los menús---------------- */
+                .fi-sidebar-item-label {
+                font-weight: 700 !important;
+                color: #0D4715 !important;
+                }
+
+                /*------------------Cambiar el color a los grupos ejemplos: Operaciones ,Catalogos-----------------------*/
+                .fi-sidebar-group-label {
+                font-weight: 700 !important;
+                color: #0D4715 !important;
+                }
+
+                /*---------------Cambiar color del ícono/flechita del grupo de navegación--------------------*/
+                    .fi-icon-btn {
+                        color: #0D4715; /* Por ejemplo, un púrpura bonito */
+                        stroke-width: 2.5;
+                    }
+                /*-------------------------Cambiar el color de los iconos---------------------------*/
+                /* Sidebar: íconos */
+                .fi-sidebar-item-icon {
+                font-weight: 700 !important;
+                color: #0D4715 !important;
+                stroke-width: 2.5; /* Más grueso para íconos tipo SVG */
+                }
+
+
+
+
+}
+
+            </style>
+            ')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
