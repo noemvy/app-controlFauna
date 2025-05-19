@@ -108,24 +108,36 @@ class PatrullajeResource extends Resource
                             return [];
                         }
 
-                        return Especie::where('grupos_id', $grupoId)->pluck('nombre_cientifico','nombre_comun', 'id');
+                        return Especie::where('grupos_id', $grupoId)->pluck('nombre_cientifico', 'id');
                     })
                     ->searchable()
                     ->required()
                     ->disabled(fn (callable $get) => !$get('grupos_id')),
                     Select::make('catinventario_id')
-                            ->label('Herramienta Utilizada:')
-                            ->options(CatalogoInventario::pluck('nombre', 'id'))
-                            ->searchable()
-                            ->required(),
+                    ->label('Herramienta Utilizada:')
+                    ->options(CatalogoInventario::pluck('nombre', 'id'))
+                    ->searchable()
+                    ->reactive()
+                    ->required()
+                    ->dehydrated()
+                    ->afterStateUpdated(function (callable $set, $state) {
+                        // Cuando cambia la herramienta, buscamos su acción relacionada y seteamos el campo acciones_id
+                        $accionId = CatalogoInventario::where('id', $state)->value('acciones_id');
+                        $set('acciones_id', $accionId);
+                    }),
 
                     Select::make('acciones_id')
-                            ->label('Tipo de Acción Realizada:')
-                            ->options(Acciones::pluck('nombre', 'id'))
-                            ->searchable()
-                            ->required(),
+                        ->label('Tipo de Acción Realizada:')
+                        ->options(Acciones::pluck('nombre', 'id'))
+                        ->searchable()
+                        ->required()
+                        ->disabled()
+                        ->dehydrated(), // Deshabilitamos para que el usuario no cambie, ya que se determina automáticamente
+
+
 
                     Select::make('atractivos_id')
+
                             ->label('Atractivo para la Fauna')
                             ->options(Atractivo::pluck('nombre', 'id'))
                             ->searchable()
