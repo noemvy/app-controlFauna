@@ -17,7 +17,8 @@ class MovimientoInventarioResource extends Resource
 {
     protected static ?string $model = MovimientoInventario::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'lucide-package-open';
+    protected static ?string $navigationGroup = 'Inventario';
 
     public static function form(Form $form): Form
     {

@@ -7,8 +7,10 @@ use App\Filament\Resources\PatrullajeResource\RelationManagers\IntervencionesRel
 use App\Models\Patrullaje;
 use App\Models\User;
 use App\Models\Acciones;
+use App\Models\Atractivo;
 use App\Models\Aerodromo;
 use App\Models\Especie;
+use App\Models\Grupo;
 use App\Models\CatalogoInventario;
 use App\Models\IntervencionesDraft;
 use Filament\Forms;
@@ -25,6 +27,7 @@ use Filament\Forms\Components\Actions;
 use Filament\Forms\Components\Select;
 use Carbon\Carbon;
 use Filament\Forms\Components\Grid;
+use Illuminate\Support\Facades\Http;
 
 class PatrullajeResource extends Resource
 {
@@ -77,6 +80,7 @@ class PatrullajeResource extends Resource
                     ->label('Agregar Intervención')
                     ->icon('heroicon-o-plus')
                     ->color('success')
+
                     ->modalHeading('Nueva Intervención')
                     ->modalSubmitActionLabel('Guardar')
                     ->modalWidth('4xl')
@@ -89,14 +93,29 @@ class PatrullajeResource extends Resource
                     ->default(Filament::auth()->id())
                     ->disabled()
                     ->dehydrated(true),
-                    Select::make('especies_id')
-                            ->label('Especie')
-                            ->options(Especie::pluck('nombre_comun', 'id'))
-                            ->searchable()
-                            ->required(),
+                Select::make('grupos_id')
+                    ->label('Grupo')
+                    ->options(Grupo::pluck('nombre', 'id'))
+                    ->reactive()
+                    ->afterStateUpdated(fn (callable $set) => $set('especies_id', null)),
+
+                Select::make('especies_id')
+                    ->label('Especie')
+                    ->options(function (callable $get) {
+                        $grupoId = $get('grupos_id');
+
+                        if (!$grupoId) {
+                            return [];
+                        }
+
+                        return Especie::where('grupos_id', $grupoId)->pluck('nombre_cientifico','nombre_comun', 'id');
+                    })
+                    ->searchable()
+                    ->required()
+                    ->disabled(fn (callable $get) => !$get('grupos_id')),
                     Select::make('catinventario_id')
                             ->label('Herramienta Utilizada:')
-                            ->options(CatalogoInventario::pluck('nombre', 'id')) // Aseguramos que no haya error
+                            ->options(CatalogoInventario::pluck('nombre', 'id'))
                             ->searchable()
                             ->required(),
 
@@ -108,7 +127,7 @@ class PatrullajeResource extends Resource
 
                     Select::make('atractivos_id')
                             ->label('Atractivo para la Fauna')
-                            ->options(\App\Models\Atractivo::pluck('nombre', 'id'))
+                            ->options(Atractivo::pluck('nombre', 'id'))
                             ->searchable()
                             ->required(),
 
@@ -121,19 +140,129 @@ class PatrullajeResource extends Resource
                     TextInput::make('coordenada_x')
                         ->label('Coordenada X')
                         ->numeric()
-                        ->step(0.000001),
+                        ->step(0.000001)
+                        ->disabled()
+                        ->dehydrated()
+                        ->afterStateHydrated(function (\Filament\Forms\Components\TextInput $component, $state) {
+                            if (blank($state)) {
+                                $apiKey = config('services.openweathermap.key');
+                                $city = 'Panama,PA';
+
+                                $response = Http::get('https://api.openweathermap.org/data/2.5/weather', [
+                                    'q' => $city,
+                                    'appid' => $apiKey,
+                                    'units' => 'metric',
+                                ]);
+
+                                if ($response->successful()) {
+                                $weather = $response->json();
+                                $lat = $weather['coord']['lat'];
+
+                                $lat_formateado = number_format($lat, 8, '.', '');
+
+                                $component->state($lat_formateado);
+                                }
+                            }
+                        }),
 
                     TextInput::make('coordenada_y')
                         ->label('Coordenada Y')
                         ->numeric()
-                        ->step(0.000001),
+                        ->step(0.000001)
+                        ->disabled()
+                        ->dehydrated()
+                        ->afterStateHydrated(function (\Filament\Forms\Components\TextInput $component, $state) {
+                            if (blank($state)) {
+                                $apiKey = config('services.openweathermap.key');
+                                $city = 'Panama,PA';
 
-                    TextInput::make('temperatura')->numeric()->label('Temperatura'),
+                                $response = Http::get('https://api.openweathermap.org/data/2.5/weather', [
+                                    'q' => $city,
+                                    'appid' => $apiKey,
+                                    'units' => 'metric',
+                                ]);
+                                if ($response->successful()) {
+                                $weather = $response->json();
+                                $lon = $weather['coord']['lon'];
 
-                    TextInput::make('viento')->numeric()->label('Viento'),
+                                // Forzar 8 decimales
+                                $lon_formateado = number_format($lon, 8, '.', '');
 
-                    TextInput::make('humedad')->numeric()->label('Humedad'),
+                                $component->state($lon_formateado);
+                                }
+                            }
+                        }),
 
+                    TextInput::make('temperatura')
+                    ->numeric()
+                    ->label('Temperatura')
+                    ->suffix('°C')
+                    ->disabled()
+                    ->dehydrated()
+                    ->afterStateHydrated(function (\Filament\Forms\Components\TextInput $component, $state) {
+                            if (blank($state)) {
+                                $apiKey = config('services.openweathermap.key');
+                                $city = 'Panama,PA';
+
+                                $response = Http::get('https://api.openweathermap.org/data/2.5/weather', [
+                                    'q' => $city,
+                                    'appid' => $apiKey,
+                                    'units' => 'metric',
+                                ]);
+
+                                if ($response->successful()) {
+                                    $weather = $response->json();
+                                    $component->state($weather['main']['temp']);
+                                }
+                            }
+                        }),
+
+                    TextInput::make('viento')
+                        ->numeric()
+                        ->label('Viento')
+                        ->disabled()
+                        ->dehydrated()
+                        ->suffix('m/s')
+                        ->afterStateHydrated(function (\Filament\Forms\Components\TextInput $component, $state) {
+                            if (blank($state)) {
+                                $apiKey = config('services.openweathermap.key');
+                                $city = 'Panama,PA';
+
+                                $response = Http::get('https://api.openweathermap.org/data/2.5/weather', [
+                                    'q' => $city,
+                                    'appid' => $apiKey,
+                                    'units' => 'metric',
+                                ]);
+
+                                if ($response->successful()) {
+                                    $weather = $response->json();
+                                    $component->state($weather['wind']['speed']);
+                                }
+                            }
+                        }),
+                    TextInput::make('humedad')
+                    ->numeric()
+                    ->label('Humedad')
+                    ->suffix('%')
+                    ->disabled()
+                    ->dehydrated()
+                    ->afterStateHydrated(function (\Filament\Forms\Components\TextInput $component, $state) {
+                            if (blank($state)) {
+                                $apiKey = config('services.openweathermap.key');
+                                $city = 'Panama,PA';
+
+                                $response = Http::get('https://api.openweathermap.org/data/2.5/weather', [
+                                    'q' => $city,
+                                    'appid' => $apiKey,
+                                    'units' => 'metric',
+                                ]);
+
+                                if ($response->successful()) {
+                                    $weather = $response->json();
+                                    $component->state($weather['main']['humidity']);
+                                }
+                            }
+                        }),
                     FileUpload::make('fotos')
                         ->label('Fotos')
                         ->multiple()
@@ -147,7 +276,8 @@ class PatrullajeResource extends Resource
                         ->nullable()
                         ->columnSpan(2),
                     ]),
-                ])//Se guarda en la tabla Intervenciones Draft.
+                ])
+                //Se guarda en la tabla Intervenciones Draft.
                 ->action(function (array $data): void {
                 IntervencionesDraft::create([
                 ...$data,
@@ -165,7 +295,10 @@ class PatrullajeResource extends Resource
     {
         return $table
             ->columns([
-                // Aquí puedes agregar columnas si deseas
+                Tables\Columns\TextColumn::make('user.name')->label('Usuario'),
+                Tables\Columns\TextColumn::make('inicio')->label('Hora de Inicio'),
+                Tables\Columns\TextColumn::make('fin')->label('Hora de Finalización'),
+
             ])
             ->filters([
                 //
