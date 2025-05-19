@@ -15,7 +15,7 @@ class CreatePatrullaje extends CreateRecord
 
 {
     protected static string $resource = PatrullajeResource::class;
-     protected function getFormActions(): array
+    protected function getFormActions(): array
     {
         return [
             Action::make('finalizar')
@@ -29,12 +29,12 @@ class CreatePatrullaje extends CreateRecord
 
                     $drafts = IntervencionesDraft::where('user_id', Filament::auth()->id())->get();
 
-foreach ($drafts as $draft) {
-    $data = $draft->only([
-        'especies_id', 'catinventario_id', 'acciones_id', 'atractivos_id',
-        'vistos', 'sacrificados', 'dispersados', 'coordenada_x', 'coordenada_y',
-        'temperatura', 'viento', 'humedad', 'fotos', 'comentarios'
-    ]);
+                    foreach ($drafts as $draft) {
+                    $data = $draft->only([
+                        'especies_id', 'catinventario_id', 'acciones_id', 'atractivos_id',
+                        'vistos', 'sacrificados', 'dispersados', 'coordenada_x', 'coordenada_y',
+                        'temperatura', 'viento', 'humedad', 'fotos', 'comentarios'
+                    ]);
 
     // Aquí le asignas el patrullaje_id
     $data['patrullaje_id'] = $this->record->id;
@@ -43,8 +43,6 @@ foreach ($drafts as $draft) {
 
     $draft->delete();
 }
-
-
                     Notification::make()
                         ->title('Patrullaje Finalizado')
                         ->success()

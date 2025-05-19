@@ -19,9 +19,9 @@ class CatalogoInventarioResource extends Resource
 {
     protected static ?string $model = CatalogoInventario::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-flag';
+    protected static ?string $navigationIcon = 'heroicon-o-pencil-square';
     protected static ?string $navigationLabel = "Catálogo de Inventario";
-    protected static ?string $navigationGroup = 'Catálogos';
+    protected static ?string $navigationGroup = 'Inventario';
     protected static ?int $navigationSort = 8;
 
     public static function form(Form $form): Form

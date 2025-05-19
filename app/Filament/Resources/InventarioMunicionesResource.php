@@ -25,9 +25,9 @@ class InventarioMunicionesResource extends Resource
     protected static ?string $model = InventarioMuniciones::class;
 
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationLabel = "Inventario de Municiones";
-    protected static ?string $navigationGroup = 'Catálogos';
+    protected static ?string $navigationIcon = 'lucide-package';
+    protected static ?string $navigationLabel = "Inventario de Equipos";
+    protected static ?string $navigationGroup = 'Inventario';
     protected static ?int $navigationSort = 9;
     protected static ?string $modelLabel = 'Inventario de Equipos';
 

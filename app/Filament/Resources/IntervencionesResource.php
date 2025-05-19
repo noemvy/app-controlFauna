@@ -24,7 +24,8 @@ class IntervencionesResource extends Resource
 {
     protected static ?string $model = Intervenciones::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'lucide-siren';
+    protected static ?string $navigationGroup = 'Operaciones';
 
     public static function form(Form $form): Form
     {

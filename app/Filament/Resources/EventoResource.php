@@ -15,7 +15,7 @@ use Filament\Facades\Filament;
 class EventoResource extends Resource
 {
     protected static ?string $model = Evento::class;
-    protected static ?string $navigationIcon = 'heroicon-o-calendar';
+    protected static ?string $navigationIcon = 'lucide-radio-tower';
      protected static ?string $navigationLabel = 'Eventos';
 
     // Añadir el grupo de navegación "Operaciones"
