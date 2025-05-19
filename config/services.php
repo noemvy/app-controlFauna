@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+
+    //API DE CLIMA 
+    'openweathermap' => [
+    'key' => env('OPENWEATHERMAP_KEY'),
+],
+
+
 ];
