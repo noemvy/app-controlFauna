@@ -41,6 +41,12 @@ public function movimientos()
 }
 
 
-
+ /**
+     * Relación con intervenciones que han utilizado esta munición.
+     */
+    public function intervenciones()
+    {
+        return $this->hasMany(Intervenciones::class, 'inventario_municiones_id');
+    }
 
 }

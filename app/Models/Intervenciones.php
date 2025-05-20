@@ -28,6 +28,7 @@ class Intervenciones extends Model
 
     protected $casts = [
         'fotos' => 'array',
+        'municion_utilizada' => 'array',
     ];
 
     // Relación con Especie

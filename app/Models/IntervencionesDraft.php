@@ -15,6 +15,7 @@ class IntervencionesDraft extends Model
         'user_id',
         'especies_id',
         'catinventario_id',
+        'municion_utilizada',
         'acciones_id',
         'atractivos_id',
         'guardado',
@@ -38,6 +39,9 @@ class IntervencionesDraft extends Model
         'temperatura' => 'float',
         'viento' => 'float',
         'humedad' => 'float',
+        'municion_utilizada' => 'array',
+
+
     ];
 
     // Relaciones
@@ -60,4 +64,15 @@ class IntervencionesDraft extends Model
     {
         return $this->belongsTo(Atractivo::class, 'atractivos_id');
     }
+
+    public function inventarioMuniciones()
+{
+    return $this->hasMany(IntervencionesDraft::class);
 }
+
+
+
+
+
+}
+
