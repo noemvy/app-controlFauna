@@ -36,6 +36,7 @@ class CreatePatrullaje extends CreateRecord
                             'especies_id',
                             'catinventario_id',
                             'acciones_id',
+                            'cantidad_utilizada',
                             'atractivos_id',
                             'vistos',
                             'sacrificados',

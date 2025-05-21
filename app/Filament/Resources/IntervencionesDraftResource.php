@@ -47,73 +47,6 @@ class IntervencionesDraftResource extends Resource
                 ->default(Filament::auth()->id())
                 ->disabled()
                 ->dehydrated(true),
-            //Grupo de especies para obtener el grupo especifico.
-            Select::make('grupos_id')
-                ->label('Grupo')
-                ->options(Grupo::pluck('nombre', 'id'))
-                ->reactive()
-                ->afterStateUpdated(fn (callable $set) => $set('especies_id', null)),
-            //Especies, que dependiendo del grupo se desplieguen las especies del grupo escogido.
-            Select::make('especies_id')
-                ->label('Especie')
-                ->options(function (callable $get) {
-                    $grupoId = $get('grupos_id');
-                    if (!$grupoId) {
-                        return [];
-                    }
-                    return Especie::where('grupos_id', $grupoId)->pluck('nombre_cientifico', 'id');
-                })
-                ->searchable()
-                ->required()
-                ->disabled(fn (callable $get) => !$get('grupos_id')),
-                Forms\Components\Repeater::make('municion_utilizada')
-                ->label('')
-                ->schema([
-                TextInput::make('aerodromo_debug')
-                ->label('Aeródromo')
-                ->default(fn () => Filament::auth()->user()?->aerodromo_id)
-                ->disabled(),
-                //Catalogo de Inventario
-                Select::make('catinventario_id')
-                ->label('Herramienta Utilizada:')
-                ->options(CatalogoInventario::pluck('nombre', 'id'))
-                ->searchable()
-                ->reactive()
-                ->required()
-                ->dehydrated()
-                ->afterStateUpdated(function (callable $set, $state) {
-                    // Cuando cambia la herramienta, buscamos su acción relacionada y seteamos el campo acciones_id
-                    $accionId = CatalogoInventario::where('id', $state)->value('acciones_id');
-                    $set('acciones_id', $accionId);
-                }),
-                 //Acciones que dependiendo de la herramienta se elija de una vez la acción asociada a la herramienta
-                Select::make('acciones_id')
-                ->label('Tipo de Acción Realizada:')
-                ->options(Acciones::pluck('nombre', 'id'))
-                ->searchable()
-                ->required()
-                ->disabled()
-                ->dehydrated(),
-                TextInput::make('cantidad_utilizada')
-                ->label('Cantidad a utilizar')
-                ->numeric()
-                ->required()
-            ])
-            ->minItems(1)
-            ->defaultItems(1)
-            ->reorderable()
-            ->collapsible(),
-            //Atractivo para la fauna
-            Select::make('atractivos_id')
-                ->label('Atractivo')
-                ->options(Atractivo::pluck('nombre', 'id'))
-                ->searchable()
-                ->required(),
-
-            TextInput::make('vistos')->numeric()->label('Vistos'),
-            TextInput::make('sacrificados')->numeric()->label('Sacrificados'),
-            TextInput::make('dispersados')->numeric()->label('Dispersados'),
-
             //Coordenada x con la Api
             TextInput::make('coordenada_x')
                 ->label('Coordenada X')
@@ -157,6 +90,36 @@ class IntervencionesDraftResource extends Resource
                 ->disabled()
                 ->dehydrated()
                 ->default(fn() => data_get(static::getWeatherData(),'main.humidity')),
+            //Grupo de especies para obtener el grupo especifico.
+            Select::make('grupos_id')
+                ->label('Grupo')
+                ->options(Grupo::pluck('nombre', 'id'))
+                ->reactive()
+                ->afterStateUpdated(fn (callable $set) => $set('especies_id', null)),
+            //Especies, que dependiendo del grupo se desplieguen las especies del grupo escogido.
+            Select::make('especies_id')
+                ->label('Especie')
+                ->options(function (callable $get) {
+                    $grupoId = $get('grupos_id');
+                    if (!$grupoId) {
+                        return [];
+                    }
+                    return Especie::where('grupos_id', $grupoId)->pluck('nombre_cientifico', 'id');
+                })
+                ->searchable()
+                ->required()
+                ->disabled(fn (callable $get) => !$get('grupos_id')),
+            //Atractivo para la fauna
+            Select::make('atractivos_id')
+                ->label('Atractivo')
+                ->options(Atractivo::pluck('nombre', 'id'))
+                ->searchable()
+                ->required(),
+
+            TextInput::make('vistos')->numeric()->label('Vistos'),
+            TextInput::make('sacrificados')->numeric()->label('Sacrificados'),
+            TextInput::make('dispersados')->numeric()->label('Dispersados'),
+
             //Insertar imagen
             FileUpload::make('fotos')
                     ->label('Fotos')
@@ -168,6 +131,48 @@ class IntervencionesDraftResource extends Resource
                     ->nullable(),
             //Comentarios Opcionales
             Textarea::make('comentarios')->label('Comentarios')->nullable(),
+
+            /*----------------------------------------------------SECCIÓN PARA ESCOGER LA CANTIDAD DE MUNICIONES USADAS-------------------------------------------------- */
+            Forms\Components\Repeater::make('municion_utilizada')
+                ->label('')
+                ->schema([
+                Forms\Components\Select::make('aerodromo_id')
+                ->label('Aeropuerto')
+                ->options(Aerodromo::pluck('nombre', 'id'))
+                ->required()
+                ->default(Filament::auth()->user()->aerodromo_id)
+                ->disabled()
+                ->dehydrated(true),
+                //Catalogo de Inventario
+                Select::make('catinventario_id')
+                ->label('Herramienta Utilizada:')
+                ->options(CatalogoInventario::pluck('nombre', 'id'))
+                ->searchable()
+                ->reactive()
+                ->required()
+                ->dehydrated()
+                ->afterStateUpdated(function (callable $set, $state) {
+                    // Cuando cambia la herramienta, buscamos su acción relacionada y seteamos el campo acciones_id
+                    $accionId = CatalogoInventario::where('id', $state)->value('acciones_id');
+                    $set('acciones_id', $accionId);
+                }),
+                 //Acciones que dependiendo de la herramienta se elija de una vez la acción asociada a la herramienta
+                Select::make('acciones_id')
+                ->label('Tipo de Acción Realizada:')
+                ->options(Acciones::pluck('nombre', 'id'))
+                ->searchable()
+                ->required()
+                ->disabled()
+                ->dehydrated(),
+                TextInput::make('cantidad_utilizada')
+                ->label('Cantidad a utilizar')
+                ->numeric()
+                ->required()
+            ])
+            ->minItems(1)
+            ->defaultItems(1)
+            ->reorderable()
+            ->collapsible(),
             ]);
 
     }
@@ -210,8 +215,6 @@ class IntervencionesDraftResource extends Resource
             'edit' => Pages\EditIntervencionesDraft::route('/{record}/edit'),
         ];
     }
-
-
 protected static function getWeatherData(string $city = 'Panama,PA')
 {
     return \Illuminate\Support\Facades\Cache::remember("weather_{$city}", now()->addMinutes(15), function () use ($city) {

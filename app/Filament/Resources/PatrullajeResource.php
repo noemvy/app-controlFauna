@@ -30,10 +30,13 @@ class PatrullajeResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('aerodromo_id')
-                    ->label('Aeródromo')
-                    ->options(Aerodromo::pluck('nombre', 'id'))
-                    ->required(),
+            Forms\Components\Select::make('aerodromo_id')
+                ->label('Aeropuerto')
+                ->options(Aerodromo::pluck('nombre', 'id'))
+                ->required()
+                ->default(Filament::auth()->user()->aerodromo_id)
+                ->disabled()
+                ->dehydrated(true),
 
                 Forms\Components\Select::make('user_id')
                     ->label('Usuario')
