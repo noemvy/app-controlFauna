@@ -45,6 +45,7 @@ class UsersSeeder extends Seeder
                 'name' => 'noemi',
                 'email' => 'noemi@gmail.com',
                 'password' => Hash::make('Tocumen123'),
+                'aerodromo_id' => 1,
                 'estado' => '1',
                 'created_at' => now(),
                 'updated_at' => now(),
