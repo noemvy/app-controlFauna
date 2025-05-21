@@ -32,7 +32,8 @@ class DashboardPanelProvider extends PanelProvider
             ->brandLogo(asset('images/logo-fauna.png'))
             ->brandLogoHeight('60px')
             ->colors([
-                'primary' => Color::Lime
+                'primary' => Color::Lime,
+                'info' => Color::Blue,
             ])
             ->widgets([
                 PatrullajeStats::class,
