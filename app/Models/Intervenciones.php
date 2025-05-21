@@ -13,6 +13,7 @@ class Intervenciones extends Model
         'catinventario_id',
         'acciones_id',
         'atractivos_id',
+        'cantidad_utilizada',
         'guardado',
         'vistos',
         'sacrificados',

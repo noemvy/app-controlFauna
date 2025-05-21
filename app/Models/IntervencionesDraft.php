@@ -15,6 +15,7 @@ class IntervencionesDraft extends Model
         'user_id',
         'especies_id',
         'catinventario_id',
+        'cantidad_utilizada',
         'municion_utilizada',
         'acciones_id',
         'atractivos_id',
