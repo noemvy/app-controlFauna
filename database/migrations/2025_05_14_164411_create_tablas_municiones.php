@@ -52,7 +52,7 @@ return new class extends Migration
 
     });
 
-      Schema::create('transferencias_municiones', function (Blueprint $table) {
+    Schema::create('transferencias_municiones', function (Blueprint $table) {
             $table->id();
             $table->foreignId('aerodromo_origen_id')->nullable()->constrained('aerodromos')->nullOnDelete();
             $table->foreignId('aerodromo_destino_id')->nullable()->constrained('aerodromos')->nullOnDelete();
@@ -75,6 +75,6 @@ return new class extends Migration
         Schema::dropIfExists('movimiento_inventario');
         Schema::dropIfExists('inventario_municiones');
         Schema::dropIfExists('catalogo_inventarios');
-        
+
     }
 };

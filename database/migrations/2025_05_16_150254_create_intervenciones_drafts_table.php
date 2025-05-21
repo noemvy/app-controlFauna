@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('especies_id')->constrained('especies')->onDelete('cascade');
             $table->foreignId('catinventario_id')->constrained('catalogo_inventarios')->onDelete('cascade');
+            $table->json('municion_utilizada')->nullable();
+            $table->json('cantidad_utilizada')->nullable();
             $table->foreignId('acciones_id')->constrained('acciones')->onDelete('cascade');
             $table->foreignId('atractivos_id')->constrained('atractivos')->onDelete('cascade');
             $table->boolean('guardado')->default(false)->nullable();
