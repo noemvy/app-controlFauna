@@ -72,6 +72,12 @@ class IntervencionesDraft extends Model
 }
 
 
+public function patrullaje()
+    {
+        return $this->belongsTo(Patrullaje::class,);
+    }
+
+
 
 
 

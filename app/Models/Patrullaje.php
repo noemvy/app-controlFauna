@@ -30,6 +30,10 @@ public function intervenciones()
 {
     return $this->hasMany(Intervenciones::class);
 }
+public function intervencionesDraft()
+{
+    return $this->hasMany(Intervenciones::class);
+}
 
 
 
