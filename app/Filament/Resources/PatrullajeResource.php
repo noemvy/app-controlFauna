@@ -3,11 +3,9 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PatrullajeResource\Pages;
-use App\Filament\Resources\PatrullajeResource\RelationManagers\IntervencionesRelationManager;
 use App\Models\Patrullaje;
 use App\Models\User;
 use App\Models\Aerodromo;
-use App\Models\IntervencionesDraft;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -48,13 +46,14 @@ class PatrullajeResource extends Resource
 
                 Forms\Components\Select::make('estado')
                     ->label('Estado')
+
                     ->options([
                         'en_proceso' => '🟢En Proceso',
                         'finalizacion' => '🔴Finalización',
                     ])
                     ->required()
-                    ->reactive()
-                    ->default('en_proceso'),
+                    ->default('en_proceso')
+                    ->reactive(),
 
             Forms\Components\TextInput::make('inicio')
                     ->label('Inicio')
@@ -71,10 +70,20 @@ class PatrullajeResource extends Resource
                     ->url(route('filament.dashboard.resources.intervenciones-drafts.create', ['returnTo' => 'patrullaje']))
                     ->icon('heroicon-o-plus')
                     ->color('success')
-                    ])
-                    ])
+                    ]),
+                    Forms\Components\Placeholder::make('conteoIntervenciones')
+    ->label('')
+    ->content(function () {
+        $userId = Filament::auth()->id();
 
-        ]);
+        $count = \App\Models\IntervencionesDraft::where('user_id', $userId)->count();
+
+        return "Total: {$count} intervención(es) creadas";
+    }),
+
+
+                    ])
+            ]);
     }
     public static function table(Table $table): Table
     {
@@ -97,7 +106,6 @@ class PatrullajeResource extends Resource
     public static function getRelations(): array
     {
         return [
-            // IntervencionesRelationManager::class,
         ];
     }
 

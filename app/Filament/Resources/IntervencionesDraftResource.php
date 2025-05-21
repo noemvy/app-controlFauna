@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\IntervencionesDraftResource\Pages;
-use App\Filament\Resources\IntervencionesDraftResource\RelationManagers;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -15,18 +14,15 @@ use App\Models\CatalogoInventario;
 use App\Models\Acciones;
 use App\Models\Atractivo;
 use App\Models\IntervencionesDraft;
-use App\Models\InventarioMuniciones;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Facades\Filament;
-use Illuminate\Support\Facades\Http;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
-use Filament\Notifications\Notification;
 
 class IntervencionesDraftResource extends Resource
 {
@@ -57,7 +53,7 @@ class IntervencionesDraftResource extends Resource
                 ->default(fn() => data_get(static::getWeatherData(), 'coord.lat')
                     ? number_format(data_get(static::getWeatherData(), 'coord.lat'), 8, '.', '')
                     : null),
-
+            //Coordenada Y
             TextInput::make('coordenada_y')
                 ->label('Coordenada Y')
                 ->numeric()
@@ -93,7 +89,7 @@ class IntervencionesDraftResource extends Resource
             //Grupo de especies para obtener el grupo especifico.
             Select::make('grupos_id')
                 ->label('Grupo')
-                ->options(Grupo::pluck('nombre', 'id'))
+                ->options(Grupo::orderBy('nombre')->pluck('nombre', 'id'))
                 ->reactive()
                 ->afterStateUpdated(fn (callable $set) => $set('especies_id', null)),
             //Especies, que dependiendo del grupo se desplieguen las especies del grupo escogido.
@@ -104,7 +100,7 @@ class IntervencionesDraftResource extends Resource
                     if (!$grupoId) {
                         return [];
                     }
-                    return Especie::where('grupos_id', $grupoId)->pluck('nombre_cientifico', 'id');
+                    return Especie::where('grupos_id', $grupoId)->orderBy('nombre_cientifico')->pluck('nombre_cientifico', 'id');
                 })
                 ->searchable()
                 ->required()
@@ -115,11 +111,67 @@ class IntervencionesDraftResource extends Resource
                 ->options(Atractivo::pluck('nombre', 'id'))
                 ->searchable()
                 ->required(),
+            //Select para escoger la cantidad de fauna vista.
+            Select::make('vistos')
+            ->options(['0' => '0 (0)',
+                        '1' => '1 (1)',
+                        '2' => '2 (2)',
+                        '3' => '3 (3)',
+                        '4' => '4 (4)',
+                        '5' => '5 (5)',
+                        '6' => '6 (6)',
+                        '7' => '7 (7)',
+                        '8' => '8 (8)',
+                        '9' => '9 (9)',
+                        '10' => '10 (10)',
+                        '15' => '15 (11–20)',
+                        '25' => '25 (21–30)',
+                        '35' => '35 (31–40)',
+                        '45' => '45 (41–50)',
+                        '63' => '63 (51–75)',])
+            ->label('Vistos')
+            ->placeholder('Seleccione una cantidad'),
+            //Select para escoger la cantidad de fauna sacrificada , si es el caso
+            Select::make('sacrificados')
+            ->label('Sacrificados')
+            ->options(['0' => '0 (0)',
+                        '1' => '1 (1)',
+                        '2' => '2 (2)',
+                        '3' => '3 (3)',
+                        '4' => '4 (4)',
+                        '5' => '5 (5)',
+                        '6' => '6 (6)',
+                        '7' => '7 (7)',
+                        '8' => '8 (8)',
+                        '9' => '9 (9)',
+                        '10' => '10 (10)',
+                        '15' => '15 (11–20)',
+                        '25' => '25 (21–30)',
+                        '35' => '35 (31–40)',
+                        '45' => '45 (41–50)',
+                        '63' => '63 (51–75)',])
+            ->placeholder('Seleccione una cantidad'),
 
-            TextInput::make('vistos')->numeric()->label('Vistos'),
-            TextInput::make('sacrificados')->numeric()->label('Sacrificados'),
-            TextInput::make('dispersados')->numeric()->label('Dispersados'),
-
+            //Select para escoger cantidad de fauna dispersada
+            Select::make('dispersados')
+            ->label('Dispersados')
+            ->options(['0' => '0 (0)',
+                        '1' => '1 (1)',
+                        '2' => '2 (2)',
+                        '3' => '3 (3)',
+                        '4' => '4 (4)',
+                        '5' => '5 (5)',
+                        '6' => '6 (6)',
+                        '7' => '7 (7)',
+                        '8' => '8 (8)',
+                        '9' => '9 (9)',
+                        '10' => '10 (10)',
+                        '15' => '15 (11–20)',
+                        '25' => '25 (21–30)',
+                        '35' => '35 (31–40)',
+                        '45' => '45 (41–50)',
+                        '63' => '63 (51–75)',])
+            ->placeholder('Seleccione una cantidad'),
             //Insertar imagen
             FileUpload::make('fotos')
                     ->label('Fotos')
@@ -152,7 +204,7 @@ class IntervencionesDraftResource extends Resource
                 ->required()
                 ->dehydrated()
                 ->afterStateUpdated(function (callable $set, $state) {
-                    // Cuando cambia la herramienta, buscamos su acción relacionada y seteamos el campo acciones_id
+                    //Cuando se seleccione una herramienta se busca en el inventario
                     $accionId = CatalogoInventario::where('id', $state)->value('acciones_id');
                     $set('acciones_id', $accionId);
                 }),
