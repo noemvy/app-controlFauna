@@ -20,7 +20,6 @@ return new class extends Migration
             $table->json('cantidad_utilizada')->nullable();
             $table->foreignId('acciones_id')->constrained('acciones')->onDelete('cascade');
             $table->foreignId('atractivos_id')->constrained('atractivos')->onDelete('cascade');
-            $table->boolean('guardado')->default(false)->nullable();
             // $table->morphs('reportable');
             $table->integer('vistos')->nullable();
             $table->integer('sacrificados')->nullable();
