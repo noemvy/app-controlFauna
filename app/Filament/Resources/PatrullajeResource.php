@@ -94,6 +94,10 @@ class PatrullajeResource extends Resource
                 Tables\Columns\TextColumn::make('fin')->label('Hora de Finalización'),
 
             ])
+            ->actions([
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ])
             ->filters([
                 //
             ])

@@ -9,6 +9,14 @@ class Patrullaje extends Model
     protected $fillable = ['aerodromo_id', 'user_id', 'estado','inicio', 'fin'];
     protected $table = 'patrullaje';
 
+
+    protected static function booted()
+{
+    static::deleting(function ($patrullaje) {
+        $patrullaje->intervenciones()->delete();
+    });
+}
+
     //Relacion con Aerodromo
         public function aerodromo()
     {
@@ -26,14 +34,21 @@ class Patrullaje extends Model
 //     return $this->morphMany(Intervenciones::class, 'reportable');
 // }
 
+public function patrullaje()
+{
+    return $this->belongsTo(Patrullaje::class);
+}
+
 public function intervenciones()
 {
     return $this->hasMany(Intervenciones::class);
 }
+
 public function intervencionesDraft()
 {
     return $this->hasMany(Intervenciones::class);
 }
+
 
 
 

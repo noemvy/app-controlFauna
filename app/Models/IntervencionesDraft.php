@@ -30,6 +30,7 @@ class IntervencionesDraft extends Model
         'viento',
         'humedad',
         'comentarios',
+        'patrullaje_id'
     ];
 
     protected $casts = [

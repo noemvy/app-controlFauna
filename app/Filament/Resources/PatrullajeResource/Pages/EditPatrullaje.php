@@ -37,7 +37,7 @@ class EditPatrullaje extends EditRecord
                         $data = $draft->only([
                             'especies_id','catinventario_id','acciones_id','cantidad_utilizada','atractivos_id',
                             'vistos','sacrificados','dispersados','coordenada_x','coordenada_y','temperatura','viento',
-                            'humedad','fotos','comentarios','municion_utilizada',
+                            'humedad','fotos','comentarios','municion_utilizada'
                         ]);
                         $data['patrullaje_id'] = $this->record->id;
                         Intervenciones::create($data);

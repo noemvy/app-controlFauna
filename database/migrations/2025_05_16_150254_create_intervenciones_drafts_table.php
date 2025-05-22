@@ -31,6 +31,7 @@ return new class extends Migration
             $table->float('viento')->nullable();
             $table->float('humedad')->nullable();
             $table->text('comentarios')->nullable();
+            $table->foreignId('patrullaje_id')->nullable()->constrained('patrullaje')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -40,6 +41,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('intervenciones_drafts');
+         Schema::table('intervenciones_drafts', function (Blueprint $table) {
+        $table->dropForeign(['patrullaje_id']);
+        $table->dropColumn('patrullaje_id');
+        });
     }
 };
