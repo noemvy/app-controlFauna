@@ -20,6 +20,16 @@ class Evento extends Model
     }
 
 
+    public function intervencionesEvento()
+    {
+        return $this->hasMany(Intervenciones::class);
+    }
+    public function intervencionesEventoDraft()
+    {
+        return $this->hasMany(Intervenciones::class);
+    }
+
+
 
 
 }
