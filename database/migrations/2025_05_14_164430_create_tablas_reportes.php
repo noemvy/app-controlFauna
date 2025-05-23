@@ -30,9 +30,9 @@ return new class extends Migration
             $table->string('viento_direccion')->nullable();
             $table->string('condicion_visual')->nullable();
             $table->foreignId('especies_id')->nullable()->constrained('especies')->onDelete('restrict');
-            $table->string('fauna_observada')->nullable();
-            $table->string('fauna_impactada')->nullable();
-            $table->string('fauna_tamano')->nullable();
+            $table->string('fauna_observada')->nullable(); //especies cantidad
+            $table->string('fauna_impactada')->nullable(); // cantidad
+            $table->string('fauna_tamano')->nullable(); 
             $table->json('fotos')->nullable();
             $table->string('consecuencia');
             $table->text('observacion')->nullable();

@@ -1,5 +1,7 @@
 <?php
 
+/*-------------------------------------------INTERVENCIONES DE PATRULLAJE-------------------------------------------------- */
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -30,7 +32,7 @@ class Intervenciones extends Model
 
     protected $casts = [
         'fotos' => 'array',
-        'municion_utilizada' => 'array',
+        'municion_utilizada' => 'array', /*Uso de esto para capturar los datos del repeater en el resource de IntervencionesDraft */
     ];
 
     // Relación con Especie
@@ -62,10 +64,12 @@ class Intervenciones extends Model
     {
         return $this->morphTo();
     }
-public function patrullaje()
-{
-    return $this->belongsTo(Patrullaje::class);
-}
+
+    //Relacion con patrullaje
+    public function patrullaje()
+    {
+        return $this->belongsTo(Patrullaje::class);
+    }
 
 
 }

@@ -71,9 +71,12 @@ class DashboardPanelProvider extends PanelProvider
                 }
 
 
-
-
-}
+                /* Estilos para la sección .fi-section-heaction */
+                .fi-section-header {
+                    background-color: #F1F0E8;
+                    padding: 1rem;
+                    font-weight: 700;
+                }
 
             </style>
             ')

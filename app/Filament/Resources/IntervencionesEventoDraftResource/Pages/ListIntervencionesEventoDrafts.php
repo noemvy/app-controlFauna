@@ -16,12 +16,6 @@ class ListIntervencionesEventoDrafts extends ListRecords
             /*----------------------------BOTON DE NUEVA INTERVENCION--------------------------------*/
             Actions\CreateAction::make('Nueva intervención')
             ->label('Nueva Interveción'),
-
-            /*----------------------------BOTON PARA IR A IMPACTO CON FAUNA--------------------------------*/
-            Actions\CreateAction::make('Impacto con Fauna')
-            ->label('Impacto con Fauna')
-            // ->url(fn()=> route(''))
-            ->color('info')
         ];
     }
 }

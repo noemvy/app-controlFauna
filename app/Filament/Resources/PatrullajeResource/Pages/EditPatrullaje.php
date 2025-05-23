@@ -3,14 +3,12 @@
 namespace App\Filament\Resources\PatrullajeResource\Pages;
 
 use App\Filament\Resources\PatrullajeResource;
-use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
 use App\Models\IntervencionesDraft;
 use App\Models\Intervenciones;
-use App\Models\Patrullaje;
 use App\Models\InventarioMuniciones;
 use Carbon\Carbon;
 
@@ -29,7 +27,7 @@ class EditPatrullaje extends EditRecord
                     $data = $this->form->getState();
                     $this->record->update([
                     'fin' => Carbon::now('America/Panama'),
-                    'estado' => 'finalizado', //Cambie el estado de en proceso a finalizado.
+                    'estado' => 'finalizado', //Cambia el estado de en proceso a finalizado.
                     ]);
                    // Obtener borradores del usuario
                     $drafts = IntervencionesDraft::where('user_id', Filament::auth()->id())->get();
