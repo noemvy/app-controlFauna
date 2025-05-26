@@ -27,7 +27,8 @@ class ReporteImpactoAviar extends Model
         'viento_velocidad',
         'viento_direccion',
         'condicion_visual',
-        'especie_id',
+        'advertencia',
+        'especies_id',
         'fauna_observada',
         'fauna_impactada',
         'fauna_tamano',
@@ -37,7 +38,15 @@ class ReporteImpactoAviar extends Model
         'costo_reparacion',
         'costo_otros',
         'estado',
+        'cargo',
+        'user_id'
     ];
+    protected $casts =[
+    'img_paths_fauna' => 'json',
+    'img_paths_impacto' => 'json',
+    'advertencia' => 'array',
+];
+
     //Relaciones
 
     public function aerodromo()
@@ -60,9 +69,9 @@ class ReporteImpactoAviar extends Model
         return $this->belongsTo(ModeloAeronave::class);
     }
 
-    public function Especie()
+    public function especie()
     {
-        return $this->belongsTo(Especie::class);
+        return $this->belongsTo(Especie::class,'especies_id');
     }
 
     public function partesGolpeadas()
@@ -75,8 +84,14 @@ class ReporteImpactoAviar extends Model
         return $this->belongsToMany(PiezaAvion::class, 'partes_danadas', 'reporte_id', 'pieza_id')->withTimestamps();
     }
 
-    // public function actualizaciones()
-    // {
-    //     return $this->morphMany(ActualizacionesReporte::class, 'reportable');
-    // }
+    public function actualizaciones()
+    {
+        return $this->morphMany(ActualizacionesReporte::class, 'reportable');
+    }
+
+        public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
 }
