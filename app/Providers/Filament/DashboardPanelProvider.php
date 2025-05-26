@@ -2,7 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Resources\IntervencionesEventoDraftResource\Widgets\ImpactoFaunaStats;
 use App\Filament\Resources\PatrullajeResource\Widgets\PatrullajeStats;
+use App\Filament\Resources\ReporteImpactoAviarResource\Widgets\EventoIntervencionesStats;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -32,8 +34,13 @@ class DashboardPanelProvider extends PanelProvider
             ->brandLogo(asset('images/logo-fauna.png'))
             ->brandLogoHeight('60px')
             ->colors([
-                'primary' => Color::Lime,
-                'info' => Color::Blue,
+                    'danger' => Color::Red,
+                    'gray' => Color::Zinc,
+                    'info' => Color::Blue,
+                    'blue' => Color::Blue,
+                    'primary' => Color::Lime,
+                    'success' => Color::Green,
+                    'warning' => Color::Amber,
             ])
             ->widgets([
                 PatrullajeStats::class,
