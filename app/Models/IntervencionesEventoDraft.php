@@ -46,7 +46,7 @@ class IntervencionesEventoDraft extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
-    
+
     public function especie()
     {
         return $this->belongsTo(Especie::class, 'especies_id');
@@ -73,9 +73,14 @@ class IntervencionesEventoDraft extends Model
     }
 
     public function evento()
-        {
+    {
             return $this->belongsTo(Evento::class,);
-        }
+    }
+        public function actualizacionesEvento()
+    {
+        return $this->morphMany(ActualizacionesReporte::class, 'reportable');
+    }
+
 
 
 
