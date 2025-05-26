@@ -96,6 +96,6 @@ class CreateIntervencionesEventoDraft extends CreateRecord
 
     function getRedirectUrl(): string
     {
-        return route('filament.dashboard.resources.intervenciones-eventos-draft.index');
+        return route('filament.dashboard.resources.intervenciones-evento-drafts.index');
     }
 }

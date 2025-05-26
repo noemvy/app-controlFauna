@@ -256,6 +256,29 @@ class IntervencionesEventoDraftResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ViewAction::make(),
+                //Ventanita para las actualizaciones.
+            Tables\Actions\Action::make('actualizaciones')
+            ->label('Actualizaciones')
+            ->icon('heroicon-o-eye')
+            ->modalHeading('Actualizaciones del Reporte')
+            ->form([
+                Forms\Components\Textarea::make('actualizacion')
+                    ->label('Añadir Nueva Actualización')
+                    ->rows(4)
+                    ->required(),
+            ])
+            ->modalContent(function ($record) {
+            return view('components.actualizaciones-list', [ //Vista blade en la carpeta resources.
+            'actualizaciones' => $record->actualizacionesEvento()->latest()->get(), // Relación polimórfica en el modelo ReporteImpactoAviar con el modelo ActualizacionesReporte
+            ]);
+            })
+            ->action(function ($record, array $data): void {
+                $record->actualizacionesEvento()->create([
+                    'actualizacion' => $data['actualizacion'],
+                    'autor' => Filament::auth()->id()
+                ]);
+            }),
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
