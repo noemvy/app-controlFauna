@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use App\Filament\Resources\IntervencionesEventoDraftResource\Widgets\ImpactoFaunaStats;
 use App\Filament\Resources\PatrullajeResource\Widgets\PatrullajeStats;
 use App\Filament\Resources\ReporteImpactoAviarResource\Widgets\EventoIntervencionesStats;
+use App\Filament\Widgets\EstadisticasEspeciesChart;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -44,6 +45,7 @@ class DashboardPanelProvider extends PanelProvider
             ])
             ->widgets([
                 PatrullajeStats::class,
+                EstadisticasEspeciesChart::class,
             ])
             ->darkMode(false)
             ->renderHook('panels::body.start', fn()=>'
