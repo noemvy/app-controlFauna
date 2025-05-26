@@ -56,7 +56,8 @@ class MovimientoInventarioRelationManager extends RelationManager
 
                 Tables\Columns\TextColumn::make('created_at')
                 ->label('Fecha y Hora')
-                ->formatStateUsing(fn ($state) => Carbon::parse($state)->timezone('America/Panama')->format('d/m/Y H:i'))
+                ->formatStateUsing(fn ($state) => Carbon::parse($state)->timezone('America/Panama'))
+                ->dateTime('d/m/Y')
                 ->sortable(),
 
                 Tables\Columns\TextColumn::make('user.name')->label('Responsable')->searchable(), //Responsable

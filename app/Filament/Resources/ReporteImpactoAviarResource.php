@@ -71,6 +71,7 @@ class ReporteImpactoAviarResource extends Resource
                 //Aerolinea ID
                 Forms\Components\Select::make('aerolinea_id')
                 ->label('Aerolínea')
+                ->required()
                 ->relationship(
                     'aerolinea',
                     'nombre',
@@ -166,18 +167,18 @@ class ReporteImpactoAviarResource extends Resource
                 ])->columns(4),
                 Forms\Components\Section::make('Advertencia')
                 ->schema([
-                    Forms\Components\CheckboxList::make('Advertencia')
+                    Forms\Components\CheckboxList::make('advertencia')
                     ->label('¿Fue advertido por tránsito aéreo de la condición por Fauna?')
                     ->options([
                         'Si' => 'Si',
                         'No' => 'No',
                     ])
-                    ->required()
+                    ->required(),
                     ]),
                 Forms\Components\Section::make('Detalle de Fauna')
                 ->description('Detalles de la fauna impactada')
                 ->schema([
-                Forms\Components\Select::make('especie_id')
+                Forms\Components\Select::make('especies_id')
                 ->label('Especie Impactada')
                 ->placeholder('Elija una especie')
                 ->options(Especie::all()->pluck('nombre_cientifico','id'))
@@ -312,15 +313,15 @@ class ReporteImpactoAviarResource extends Resource
                 ->label('Observaciones Generales')
                 ->columnSpanFull(),
                 ]),
-                /*----------------------SECCION REPORTADOR POR--------------------------------------------------------*/
+                /*-----------------------------------SECCION REPORTADOR POR--------------------------------------------------------*/
                 Forms\Components\Section::make('Reportado por')
                 ->schema([
-                Forms\Components\Select::make('email')
-                ->label('Correo Electronico')
-                ->options(User::pluck('email','email'))
-                ->default(Filament::auth()->user()?->email)
+                Forms\Components\Select::make('user_id')->label('Usuario')
+                ->options(User::pluck('name', 'id'))
+                ->required()
+                ->default(Filament::auth()->id())
                 ->disabled()
-                ->dehydrated(),
+                ->dehydrated(true),
                 ])
                 ]);
         }
@@ -328,13 +329,47 @@ class ReporteImpactoAviarResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('aerodromo.nombre')->label('Aeropuerto')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('aerolinea.nombre')->label('Aerolinea')->sortable(),
+                Tables\Columns\TextColumn::make('fecha')
+                    ->label('Fecha de Impacto')
+                    ->dateTime('d/m/Y'),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+            //Ventanita para las actualizaciones.
+                Tables\Actions\Action::make('actualizaciones')
+                ->label('Actualizaciones')
+                ->icon('heroicon-o-eye')
+                ->modalHeading('Actualizaciones del Reporte')
+                ->form([
+                    Forms\Components\Textarea::make('actualizacion')
+                        ->label('Añadir Nueva Actualización')
+                        ->rows(4)
+                        ->required(),
+                ])
+                ->modalContent(function ($record) {
+                return view('components.actualizaciones-list', [ //Vista blade en la carpeta resources.
+                'actualizaciones' => $record->actualizaciones()->latest()->get(), // Relación polimórfica en el modelo ReporteImpactoAviar con el modelo ActualizacionesReporte
+                ]);
+                })
+                ->action(function ($record, array $data): void {
+                    $record->actualizaciones()->create([
+                        'actualizacion' => $data['actualizacion'],
+                        'autor' => Filament::auth()->id()
+                    ]);
+                }),
+
+
+                //Reporte en pdf
+                Tables\Actions\Action::make('downloadPDF')
+                    ->label('PDF')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('danger')
+                    ->url(fn($record) => route('report.pdf', $record->id))
+                    ->openUrlInNewTab(), // Esto hace que el PDF se abra en una nueva pestaña
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

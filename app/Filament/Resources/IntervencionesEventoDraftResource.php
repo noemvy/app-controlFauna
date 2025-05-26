@@ -187,6 +187,8 @@ class IntervencionesEventoDraftResource extends Resource
             Forms\Components\FileUpload::make('fotos')
                     ->label('Fotos')
                     ->multiple()
+                    ->maxFiles(5)
+                    ->image()
                     ->disk('public')
                     ->directory('intervenciones')
                     ->preserveFilenames()
