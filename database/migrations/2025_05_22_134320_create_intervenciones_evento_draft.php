@@ -43,6 +43,29 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('intervenciones_evento_draft');
+
+        Schema::table('intervenciones_evento_draft', function (Blueprint $table) {
+        $table->dropForeign(['acciones_id']);
+        $table->dropColumn('acciones_id');
+                });
+        Schema::table('intervenciones_evento_draft', function (Blueprint $table) {
+        $table->dropForeign(['catinventario_id']);
+        $table->dropColumn('catinventario_id');
+        });
+        Schema::table('intervenciones_evento_draft', function (Blueprint $table) {
+        $table->dropForeign(['atractivos_id']);
+        $table->dropColumn('atractivos_id');
+        });
+        Schema::table('intervenciones_evento_draft', function (Blueprint $table) {
+        $table->dropForeign(['especies_id']);
+        $table->dropColumn('especies_id');
+                });
+        Schema::table('intervenciones_evento_draft', function (Blueprint $table) {
+        $table->dropForeign(['user_id']);
+        $table->dropColumn('user_id');
+                });
+
+       Schema::dropIfExists('intervenciones_evento_draft');
+
     }
 };

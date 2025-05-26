@@ -13,15 +13,18 @@ return new class extends Migration
     {
         Schema::create('reporte_impactoaviar', function (Blueprint $table) {
             $table->id();
-            $table->string('codigo');
+            $table->string('codigo')->nullable();
+            /*---------------------------GENERALIDADES------------------------------------*/
             $table->foreignId('aerodromo_id')->constrained('aerodromos')->onDelete('restrict');
             $table->foreignId('pista_id')->constrained('pistas')->onDelete('restrict');
             $table->dateTime('fecha');
+            /*--------------------------AERONAVE--------------------------------------*/
             $table->foreignId('aerolinea_id')->constrained('aerolineas')->onDelete('restrict');
             $table->foreignId('modelo_id')->constrained('modelo_aeronaves')->onDelete('restrict');
             $table->string('matricula');
             $table->integer('Altitud');
             $table->integer('Velocidad')->nullable();
+            /*-------------------------CONDICIONES ATMOSFERICAS Y DE VUELO-------------------------------------*/
             $table->string('Luminosidad');
             $table->string('Fase_vuelo');
             $table->string('cielo')->nullable();
@@ -29,18 +32,27 @@ return new class extends Migration
             $table->integer('viento_velocidad')->nullable();
             $table->string('viento_direccion')->nullable();
             $table->string('condicion_visual')->nullable();
+            /*----------------------------ADVERTENCIA-----------------------------------------*/
+            $table->json('advertencia');
+            /*-----------------------------DETALLE DE FAUNA----------------------------*/
             $table->foreignId('especies_id')->nullable()->constrained('especies')->onDelete('restrict');
             $table->string('fauna_observada')->nullable(); //especies cantidad
             $table->string('fauna_impactada')->nullable(); // cantidad
-            $table->string('fauna_tamano')->nullable(); 
-            $table->json('fotos')->nullable();
+            $table->string('fauna_tamano')->nullable();
+            $table->json('img_paths_fauna')->nullable();
+            $table->json('img_paths_impacto')->nullable();
+            /*----------------------------AFECTACIONES--------------------------------*/
             $table->string('consecuencia');
             $table->text('observacion')->nullable();
             $table->integer('tiempo_fs')->nullable();
             $table->decimal('costo_reparacion', 10, 2)->nullable();
             $table->decimal('costo_otros', 10, 2)->nullable();
-            $table->integer('estado');
+            $table->integer('estado')->nullable();
             $table->timestamps();
+
+            /*DATOS DEL QUE HIZO EL REPORTE*/
+            $table->string('cargo')->nullable();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
         });
 
         //Tabla Pieza Avion
