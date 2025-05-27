@@ -51,11 +51,16 @@ class IntervencionesEventoDraft extends Model
     {
         return $this->belongsTo(Especie::class, 'especies_id');
     }
+    public function grupo()
+    {
+        return $this->belongsTo(Grupo::class, 'grupos_id');
+    }
 
     public function catalogoInventario()
     {
         return $this->belongsTo(CatalogoInventario::class, 'catinventario_id');
     }
+
 
     public function accion()
     {
@@ -64,12 +69,12 @@ class IntervencionesEventoDraft extends Model
 
     public function atractivo()
     {
-        return $this->belongsTo(Atractivo::class, 'atractivos_id');
+    return $this->belongsTo(Atractivo::class, 'atractivos_id');
     }
 
     public function inventarioMuniciones()
     {
-        return $this->hasMany(IntervencionesEventoDraft::class);
+        return $this->hasMany(InventarioMuniciones::class, 'id');
     }
 
     public function evento()

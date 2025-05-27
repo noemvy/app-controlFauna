@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Especie extends Model
 {
     use HasFactory;
-    protected $fillable = ['grupo_id', 'nombre', 'nombre_comun', 'foto'];
+    protected $fillable = ['grupos_id', 'nombre_comun', 'nombre_cientifico','rango_peligrosidad','foto'];
 
 
     //Relacion con el Grupo al que pertenece la especie

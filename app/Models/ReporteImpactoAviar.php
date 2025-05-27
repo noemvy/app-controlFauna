@@ -94,4 +94,15 @@ class ReporteImpactoAviar extends Model
         return $this->belongsTo(User::class);
     }
 
+
+    //FUNCIONES PARA AGREGARLO CODIGO A LOS FORMULARIOS
+    protected static function booted()
+    {
+        parent::boot();
+
+        static::creating(function ($reporte) {
+            $ultimoId = static::max('id') + 1; // Obtiene el próximo ID
+            $reporte->codigo = 'IFA-' . str_pad($ultimoId, 4, '0', STR_PAD_LEFT); // Genera el código único
+        });
+    }
 }
