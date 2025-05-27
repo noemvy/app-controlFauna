@@ -54,7 +54,8 @@ class IntervencionesEventoDraftResource extends Resource
                     'TWR' => 'TWR',
                     'SSEI'=>'SSEI',
                     'AVSEC'=>'AVSEC',
-                ]),
+                ])
+                ->required(),
             //Coordenada x con la Api
             Forms\Components\TextInput::make('coordenada_x')
                 ->label('Coordenada X')
@@ -125,63 +126,63 @@ class IntervencionesEventoDraftResource extends Resource
             //Select para escoger la cantidad de fauna vista.
             Forms\Components\Select::make('vistos')
             ->options(['0' => '0 (0)',
-                        '1' => '1 (1)',
-                        '2' => '2 (2)',
-                        '3' => '3 (3)',
-                        '4' => '4 (4)',
-                        '5' => '5 (5)',
-                        '6' => '6 (6)',
-                        '7' => '7 (7)',
-                        '8' => '8 (8)',
-                        '9' => '9 (9)',
-                        '10' => '10 (10)',
-                        '15' => '15 (11–20)',
-                        '25' => '25 (21–30)',
-                        '35' => '35 (31–40)',
-                        '45' => '45 (41–50)',
-                        '63' => '63 (51–75)',])
+                        '1(1)' => '1 (1)',
+                        '2(2)' => '2 (2)',
+                        '3(3)' => '3 (3)',
+                        '4(4)' => '4 (4)',
+                        '5(5)' => '5 (5)',
+                        '6(6)' => '6 (6)',
+                        '7(7)' => '7 (7)',
+                        '8(8)' => '8 (8)',
+                        '9(9)' => '9 (9)',
+                        '10(10)' => '10 (10)',
+                        '15(11-20)' => '15 (11–20)',
+                        '25(21-30)' => '25 (21–30)',
+                        '35(31-40)' => '35 (31–40)',
+                        '45(41-50)' => '45 (41–50)',
+                        '63(51-75)' => '63 (51–75)',])
             ->label('Vistos')
             ->placeholder('Seleccione una cantidad'),
             //Select para escoger la cantidad de fauna sacrificada , si es el caso
             Forms\Components\Select::make('sacrificados')
             ->label('Sacrificados')
             ->options(['0' => '0 (0)',
-                        '1' => '1 (1)',
-                        '2' => '2 (2)',
-                        '3' => '3 (3)',
-                        '4' => '4 (4)',
-                        '5' => '5 (5)',
-                        '6' => '6 (6)',
-                        '7' => '7 (7)',
-                        '8' => '8 (8)',
-                        '9' => '9 (9)',
-                        '10' => '10 (10)',
-                        '15' => '15 (11–20)',
-                        '25' => '25 (21–30)',
-                        '35' => '35 (31–40)',
-                        '45' => '45 (41–50)',
-                        '63' => '63 (51–75)',])
+                        '1(1)' => '1 (1)',
+                        '2(2)' => '2 (2)',
+                        '3(3)' => '3 (3)',
+                        '4(4)' => '4 (4)',
+                        '5(5)' => '5 (5)',
+                        '6(6)' => '6 (6)',
+                        '7(7)' => '7 (7)',
+                        '8(8)' => '8 (8)',
+                        '9(9)' => '9 (9)',
+                        '10(10)' => '10 (10)',
+                        '15(11-20)' => '15 (11–20)',
+                        '25(21-30)' => '25 (21–30)',
+                        '35(31-40)' => '35 (31–40)',
+                        '45(41-50)' => '45 (41–50)',
+                        '63(51-75)' => '63 (51–75)',])
             ->placeholder('Seleccione una cantidad'),
 
             //Select para escoger cantidad de fauna dispersada
             Forms\Components\Select::make('dispersados')
             ->label('Dispersados')
             ->options(['0' => '0 (0)',
-                        '1' => '1 (1)',
-                        '2' => '2 (2)',
-                        '3' => '3 (3)',
-                        '4' => '4 (4)',
-                        '5' => '5 (5)',
-                        '6' => '6 (6)',
-                        '7' => '7 (7)',
-                        '8' => '8 (8)',
-                        '9' => '9 (9)',
-                        '10' => '10 (10)',
-                        '15' => '15 (11–20)',
-                        '25' => '25 (21–30)',
-                        '35' => '35 (31–40)',
-                        '45' => '45 (41–50)',
-                        '63' => '63 (51–75)',])
+                        '1(1)' => '1 (1)',
+                        '2(2)' => '2 (2)',
+                        '3(3)' => '3 (3)',
+                        '4(4)' => '4 (4)',
+                        '5(5)' => '5 (5)',
+                        '6(6)' => '6 (6)',
+                        '7(7)' => '7 (7)',
+                        '8(8)' => '8 (8)',
+                        '9(9)' => '9 (9)',
+                        '10(10)' => '10 (10)',
+                        '15(11-20)' => '15 (11–20)',
+                        '25(21-30)' => '25 (21–30)',
+                        '35(31-40)' => '35 (31–40)',
+                        '45(41-50)' => '45 (41–50)',
+                        '63(51-75)' => '63 (51–75)',])
             ->placeholder('Seleccione una cantidad'),
             //Insertar imagen
             Forms\Components\FileUpload::make('fotos')
@@ -246,15 +247,22 @@ class IntervencionesEventoDraftResource extends Resource
     {
         return $table
             ->columns([
+            Tables\Columns\TextColumn::make('id')->label('Código'),
             Tables\Columns\TextColumn::make('user.name')->label('Nombre'),
             Tables\Columns\TextColumn::make('origen')->label('Origen'),
             Tables\Columns\TextColumn::make('tipo_evento')->label('Tipo de Evento'),
+            Tables\Columns\TextColumn::make('created_at')->label('Fecha')->dateTime('d/m/Y'),
             ])
             ->filters([
-                //
+                //FILTROS PARA BUSQUEDA
+                Tables\Filters\SelectFilter::make('origen')->label('Origen')
+                ->options([
+                    'TWR' => 'TWR',
+                    'SSEI'=>'SSEI',
+                    'AVSEC'=>'AVSEC',
+                ])
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
                 Tables\Actions\ViewAction::make(),
                 //Ventanita para las actualizaciones.
             Tables\Actions\Action::make('actualizaciones')
@@ -278,7 +286,18 @@ class IntervencionesEventoDraftResource extends Resource
                     'autor' => Filament::auth()->id()
                 ]);
             }),
-
+            /*---------------------------Reporte en pdf-------------------------------------------------*/
+            Tables\Actions\Action::make('downloadPDF')
+                ->label('PDF')
+                ->icon('heroicon-o-arrow-down-tray')
+                ->color('danger')
+                ->url(fn($record) => route('eventoIntervenciones.pdf', $record->id))
+                // ->openUrlInNewTab(), // Esto hace que el PDF se abra en una nueva pestaña
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

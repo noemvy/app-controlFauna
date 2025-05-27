@@ -329,6 +329,7 @@ class ReporteImpactoAviarResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('codigo'),
                 Tables\Columns\TextColumn::make('aerodromo.nombre')->label('Aeropuerto')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('aerolinea.nombre')->label('Aerolinea')->sortable(),
                 Tables\Columns\TextColumn::make('fecha')
@@ -369,7 +370,6 @@ class ReporteImpactoAviarResource extends Resource
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('danger')
                 ->url(fn($record) => route('report.pdf', $record->id))
-                ->openUrlInNewTab(), // Esto hace que el PDF se abra en una nueva pestaña
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
