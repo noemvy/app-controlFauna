@@ -24,16 +24,15 @@ return new class extends Migration
             $table->float('humedad')->nullable();
             $table->foreignId('especies_id')->constrained('especies')->onDelete('cascade');
             $table->foreignId('atractivos_id')->constrained('atractivos')->onDelete('cascade');
-            $table->integer('vistos')->nullable();
-            $table->integer('sacrificados')->nullable();
-            $table->integer('dispersados')->nullable();
+            $table->string('vistos')->nullable();
+            $table->string('sacrificados')->nullable();
+            $table->string('dispersados')->nullable();
             $table->json('fotos')->nullable();
             $table->text('comentarios')->nullable();
             $table->json('municion_utilizada')->nullable();
             $table->foreignId('catinventario_id')->constrained('catalogo_inventarios')->onDelete('cascade');
             $table->foreignId('acciones_id')->constrained('acciones')->onDelete('cascade');
             $table->json('cantidad_utilizada')->nullable();
-            // $table->morphs('reportable');
             $table->timestamps();
         });
     }
