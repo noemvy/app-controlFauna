@@ -2,43 +2,41 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\Especie;
+use App\Models\CatalogoInventario;
 use App\Models\Intervenciones;
 use App\Models\IntervencionesEventoDraft;
-use App\Models\ReporteImpactoAviar;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
-class EstadisticaEspeciesChart extends ChartWidget
+class MunicionesChart extends ChartWidget
 {
-    protected static ?string $heading = 'Especies Vistas';
+    protected static ?string $heading = 'Municiones Usadas';
 
     protected function getData(): array
     {
-        //Consultas para obtner datos de todas las intervenciones en diferentes modelo
-        $query1 = IntervencionesEventoDraft::select('especies_id');
-        $query2 = Intervenciones::select('especies_id');
-        $query3 = ReporteImpactoAviar::select('especies_id');
+        //Consultas para obtener las municiones mas usadas en las intervenciones
+        $query1 = IntervencionesEventoDraft::select('catinventario_id');
+        $query2 = Intervenciones::select('catinventario_id');
 
-        $union = $query1->unionAll($query2)->unionAll($query3);
+        $union = $query1->unionAll($query2);
 
-        // Consulta para contar las especies en intervenciones
-        $resultados = DB::table(DB::raw("({$union->toSql()}) as all_intervenciones"))
+        //Contar todas las municones que se usan
+        $resultados = DB::table(DB::raw("({$union->toSql()}) as all_municiones"))
         ->mergeBindings($union->getQuery())
-        ->select('especies_id',DB::raw('count(*) as total'))
-        ->groupBy('especies_id')
+        ->select('catinventario_id',DB::raw('count(*)as total'))
+        ->groupBy('catinventario_id')
         ->get()
         ->map(function($item){
-            $nombre = Especie::find($item->especies_id)?->nombre_cientifico ?? 'Desconocida';
-            return [
-                'nombre'=>$nombre,
-                'total'=> $item->total,
-            ];
+        $nombre = CatalogoInventario::find($item->catinventario_id)?->nombre ?? 'Sin Uso';
+        return [
+            'nombre'=> $nombre,
+            'total'=>$item->total,
+        ];
         });
 
         return [
             'datasets' => [
                 [
-                    'label' => 'Avistamientos',
+                    'label' => 'Municiones',
                     'data' => $resultados->pluck('total'),
                     //COLORES PARA LAS ESTADISTICAS
                     'backgroundColor' => [
@@ -67,6 +65,6 @@ class EstadisticaEspeciesChart extends ChartWidget
 
     protected function getType(): string
     {
-        return 'bar';
+        return 'doughnut';
     }
 }
