@@ -98,7 +98,6 @@ class PatrullajeResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\DeleteAction::make(),
             ])
             ->filters([
                 //

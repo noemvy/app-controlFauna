@@ -43,11 +43,13 @@ class IntervencionesEventoDraftResource extends Resource
                 ->default(Filament::auth()->id())
                 ->disabled()
                 ->dehydrated(true),
-            Forms\Components\TextInput::make('tipo_evento')
+            Forms\Components\Select::make('tipo_evento')
                 ->label('Tipo de Evento')
-                ->default('Intervencion')
-                ->disabled()
-                ->dehydrated(true),
+                ->options([
+                    'Dispersión'=>'Dispersión',
+                    'Recogida' => 'Recogida'
+                ])
+                ->required(),
             Forms\Components\Select::make('origen')
                 ->label('Origen del Reporte')
                 ->options([
