@@ -36,29 +36,25 @@ class InventarioMunicionesResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('catinventario_id')
-                    ->label('Equipo')
-                    ->placeholder('Eliga el equipo')
-                    ->options(CatalogoInventario::all()->pluck('nombre','id'))
-                        ->required()
-                        ->searchable()
-                        ->preload(),
-                Forms\Components\Select::make('aerodromo_id')
-                    ->label('Aeropuerto')
-                    ->placeholder('Eliga el Aeropuerto al que pertenece')
-                    ->options(Aerodromo::all()->pluck('nombre','id'))
-                        ->required()
-                        ->searchable()
-                        ->preload(),
-                // Forms\Components\TextInput::make('cantidad_actual')
-                //     ->label('Cantidad Actual')
-                //     ->required()
-                //     ->maxLength(20),
-                Forms\Components\TextInput::make('cantidad_minima')
-                    ->label('Cantidad Minima')
+            Forms\Components\Select::make('catinventario_id')
+                ->label('Equipo')
+                ->placeholder('Eliga el equipo')
+                ->options(CatalogoInventario::all()->pluck('nombre','id'))
                     ->required()
-                    ->maxLength(20),
-                            ]);
+                    ->searchable()
+                    ->preload(),
+            Forms\Components\Select::make('aerodromo_id')
+                ->label('Aeropuerto')
+                ->placeholder('Eliga el Aeropuerto al que pertenece')
+                ->options(Aerodromo::all()->pluck('nombre','id'))
+                    ->required()
+                    ->searchable()
+                    ->preload(),
+            Forms\Components\TextInput::make('cantidad_minima')
+                ->label('Cantidad Minima')
+                ->required()
+                ->maxLength(20),
+                        ]);
     }
 
     public static function table(Table $table): Table
@@ -68,19 +64,23 @@ class InventarioMunicionesResource extends Resource
             Tables\Columns\TextColumn::make('catalogoInventario.nombre')->label('Equipo'),
             Tables\Columns\TextColumn::make('aerodromo.nombre')->label('Aeródromo'),
             Tables\Columns\TextColumn::make('cantidad_actual')
-    ->label('Cantidad Disponible')
-    ->formatStateUsing(function ($state, $record) {
-        return $state . ' unidades';
-    })
-    ->color(function ($state, $record) {
-        if ($state <= $record->cantidad_minima) {
-            return 'danger'; // rojo
-        } elseif ($state <= $record->cantidad_minima + 5) {
-            return 'warning'; // amarillo
-        }
-        return 'success'; // verde
-    }),
+            ->label('Cantidad Disponible')
+            ->formatStateUsing(function ($state, $record) {
+                return $state . ' unidades';
+            })
+            ->color(function ($state, $record) {
+            $minima = $record->cantidad_minima;
+            $mitad = $minima / 2;
+            $faltan = $minima - $state;
 
+            if ($state >= $minima) {
+                return 'success'; // Verde
+            } elseif ($state > $mitad && $faltan > 20) {
+                return 'warning'; // Amarillo
+            }
+
+            return 'danger'; // Rojo
+        }),
             Tables\Columns\TextColumn::make('cantidad_minima')->label('Cantidad Minima'),
 
             Tables\Columns\TextColumn::make('movimientos_count')->label('Número de Movimientos')
@@ -88,8 +88,6 @@ class InventarioMunicionesResource extends Resource
                     return $record->movimientos->count();
                 }),
                 ])
-
-
             ->filters([
                 SelectFilter::make('aerodromo.id')
                 ->label('Filtrar por Aeropuerto')

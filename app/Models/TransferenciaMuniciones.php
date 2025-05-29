@@ -81,10 +81,7 @@ class TransferenciaMuniciones extends Model
 
                 $origen->decrement('cantidad_actual', $data['cantidad']);
                 $destino->increment('cantidad_actual', $data['cantidad']);
-
-
                 self::create($data);
-
                 DB::commit();
                 return true;
 
@@ -93,7 +90,7 @@ class TransferenciaMuniciones extends Model
                 throw $e;
         }
     }
-/*--------------------------------------------------------------------------------FUNCION PARA QUE TRANSFERENCIA GUARDE TAMBIEN COMO MOVIMIENTO----------------------------------------------------------*/
+/*--------------------------------------------FUNCION PARA QUE TRANSFERENCIA GUARDE TAMBIEN COMO MOVIMIENTO----------------------------------------------------------*/
 
     protected static function booted()
     {

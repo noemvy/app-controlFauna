@@ -47,7 +47,7 @@ class IntervencionesEventoDraftResource extends Resource
                 ->label('Tipo de Evento')
                 ->default('Intervencion')
                 ->disabled()
-                ->dehydrated(),
+                ->dehydrated(true),
             Forms\Components\Select::make('origen')
                 ->label('Origen del Reporte')
                 ->options([
@@ -62,7 +62,7 @@ class IntervencionesEventoDraftResource extends Resource
                 ->numeric()
                 ->step(0.000001)
                 ->disabled()
-                ->dehydrated()
+                ->dehydrated(true)
                 ->default(fn() => data_get(static::getWeatherData(), 'coord.lat')
                     ? number_format(data_get(static::getWeatherData(), 'coord.lat'), 8, '.', '')
                     : null),
@@ -72,7 +72,7 @@ class IntervencionesEventoDraftResource extends Resource
                 ->numeric()
                 ->disabled()
                 ->step(0.000001)
-                ->dehydrated()
+                ->dehydrated(true)
                 ->default(fn() => data_get(static::getWeatherData(), 'coord.lon')
                     ? number_format(data_get(static::getWeatherData(), 'coord.lon'), 8, '.', '')
                     : null),
@@ -81,14 +81,14 @@ class IntervencionesEventoDraftResource extends Resource
                 ->label('Temperatura')
                 ->suffix('°C')
                 ->disabled()
-                ->dehydrated()
+                ->dehydrated(true)
                 ->default(fn() => data_get(static::getWeatherData(),'main.temp')),
             //Viento con la Api
             Forms\Components\TextInput::make('viento')
                 ->label('Viento')
                 ->numeric()
                 ->disabled()
-                ->dehydrated()
+                ->dehydrated(true)
                 ->suffix('m/s')
                 ->default(fn() => data_get(static::getWeatherData(),'wind.speed')),
             //Humedad con la Api
@@ -96,7 +96,7 @@ class IntervencionesEventoDraftResource extends Resource
                 ->label('Humedad')
                 ->suffix('%')
                 ->disabled()
-                ->dehydrated()
+                ->dehydrated(true)
                 ->default(fn() => data_get(static::getWeatherData(),'main.humidity')),
             //Grupo de especies para obtener el grupo especifico.
             Forms\Components\Select::make('grupos_id')
@@ -163,7 +163,6 @@ class IntervencionesEventoDraftResource extends Resource
                         '45(41-50)' => '45 (41–50)',
                         '63(51-75)' => '63 (51–75)',])
             ->placeholder('Seleccione una cantidad'),
-
             //Select para escoger cantidad de fauna dispersada
             Forms\Components\Select::make('dispersados')
             ->label('Dispersados')
@@ -197,8 +196,7 @@ class IntervencionesEventoDraftResource extends Resource
                     ->nullable(),
             //Comentarios Opcionales
             Forms\Components\Textarea::make('comentarios')->label('Comentarios')->nullable(),
-
-            /*----------------------------------------------------SECCIÓN PARA ESCOGER LA CANTIDAD DE MUNICIONES USADAS-------------------------------------------------- */
+/*----------------------------------------------------SECCIÓN PARA ESCOGER LA CANTIDAD DE MUNICIONES USADAS-------------------------------------------------- */
             Forms\Components\Repeater::make('municion_utilizada')
                 ->label('')
                 ->schema([
@@ -277,7 +275,8 @@ class IntervencionesEventoDraftResource extends Resource
             ])
             ->modalContent(function ($record) {
             return view('components.actualizaciones-list', [ //Vista blade en la carpeta resources.
-            'actualizaciones' => $record->actualizacionesEvento()->latest()->get(), // Relación polimórfica en el modelo ReporteImpactoAviar con el modelo ActualizacionesReporte
+            // Relación polimórfica en el modelo ReporteImpactoAviar con el modelo ActualizacionesReporte
+            'actualizaciones' => $record->actualizacionesEvento()->latest()->get(),
             ]);
             })
             ->action(function ($record, array $data): void {
@@ -296,12 +295,7 @@ class IntervencionesEventoDraftResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }

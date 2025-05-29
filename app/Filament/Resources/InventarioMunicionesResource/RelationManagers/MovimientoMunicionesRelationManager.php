@@ -17,13 +17,10 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\NativeSelect;
 use Filament\Notifications\Notification;
 use Filament\Facades\Filament;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\Grid;
-
 use Carbon\Carbon;
 
 class MovimientoInventarioRelationManager extends RelationManager
@@ -39,47 +36,42 @@ class MovimientoInventarioRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('catalogoInventario.nombre')->label('Equipo')->searchable(), //Catalogo de Inventario
-
-                Tables\Columns\TextColumn::make('tipo_movimiento')->label('Tipo de Movimiento'), //Tipo de Movimiento
-
-                Tables\Columns\TextColumn::make('cantidad_usar')->label('Cantidad Ingresada/Retirada'), // Cantidad a usar
-
-                Tables\Columns\TextColumn::make('stock_actual')
-                    ->label('Stock Disponible')                                      //Stock Actual
-                    ->getStateUsing(function ($record) {
-                        $inventario = InventarioMuniciones::where('aerodromo_id', $record->aerodromo_id)
-                            ->where('catinventario_id', $record->catinventario_id)
-                            ->first();
-                        return $inventario ? $inventario->cantidad_actual : 0;
-                    }),
-
-                Tables\Columns\TextColumn::make('created_at')
-                ->label('Fecha y Hora')
-                ->formatStateUsing(fn ($state) => Carbon::parse($state)->timezone('America/Panama'))
-                ->dateTime('d/m/Y')
-                ->sortable(),
-
-                Tables\Columns\TextColumn::make('user.name')->label('Responsable')->searchable(), //Responsable
+            Tables\Columns\TextColumn::make('catalogoInventario.nombre')->label('Equipo')->searchable(),
+            Tables\Columns\TextColumn::make('tipo_movimiento')->label('Tipo de Movimiento'),
+            Tables\Columns\TextColumn::make('cantidad_usar')->label('Cantidad Ingresada/Retirada'),
+            Tables\Columns\TextColumn::make('stock_actual')
+            ->label('Stock Disponible')
+            ->getStateUsing(function ($record) {
+                $inventario = InventarioMuniciones::where('aerodromo_id', $record->aerodromo_id)
+                    ->where('catinventario_id', $record->catinventario_id)
+                    ->first();
+                return $inventario ? $inventario->cantidad_actual : 0;
+            }),
+            Tables\Columns\TextColumn::make('created_at')
+            ->label('Fecha y Hora')
+            ->formatStateUsing(fn ($state) => Carbon::parse($state)->timezone('America/Panama'))
+            ->dateTime('d/m/Y')
+            ->sortable(),
+            Tables\Columns\TextColumn::make('user.name')->label('Responsable')->searchable(),
+        ])
+        ->filters([
+            SelectFilter::make('tipo_movimiento')
+            ->label('Filtrar por Tipo de Movimiento')
+            ->options([
+                'Compra' => '🟢Entrada-Compra',
+                'Donacion' => '🟢Entrada-Donación',
+                'Consumo' => '🔴 Salida-Consumo',
+                'Baja' => '🔴Salida-Baja',
+                'Ajuste' => '⚙️Ajuste',
+                'transferencia' => 'Transferencia',
             ])
-            ->filters([
-                SelectFilter::make('tipo_movimiento')
-                ->label('Filtrar por Tipo de Movimiento')
-                ->options([
-                    'Compra' => '🟢Entrada-Compra',
-                    'Donacion' => '🟢Entrada-Donación',
-                    'Consumo' => '🔴 Salida-Consumo',
-                    'Baja' => '🔴Salida-Baja',
-                    'Ajuste' => '⚙️Ajuste',
-                    'transferencia' => 'Transferencia',
-                ])
 
-            ])
-/*-------------------------------------------------------------------BOTÓN DE 🟢ENTRADA------------------------------- */
-->headerActions([
-    Tables\Actions\Action::make('entrada')
-        ->label('🟢 Entrada')
-        ->form([
+        ])
+/*-------------------------------------------------------------------BOTÓN DE 🟢ENTRADA--------------------------------------------------------------------- */
+        ->headerActions([
+        Tables\Actions\Action::make('entrada')
+            ->label('🟢 Entrada')
+            ->form([
             Select::make('aerodromo_id')
                 ->label('Aeródromo')
                 ->options(Aerodromo::pluck('nombre', 'id'))
@@ -89,7 +81,6 @@ class MovimientoInventarioRelationManager extends RelationManager
                 ->afterStateUpdated(fn (callable $set) => $set('catinventario_id', null))
                 ->disabled()
                 ->dehydrated(true),
-
             Select::make('catinventario_id')
                 ->label('Equipo')
                 ->options(CatalogoInventario::pluck('nombre', 'id'))
@@ -98,7 +89,6 @@ class MovimientoInventarioRelationManager extends RelationManager
                 ->default(fn (RelationManager $livewire) => $livewire->getOwnerRecord()->catinventario_id)
                 ->disabled()
                 ->dehydrated(true),
-
             Placeholder::make('stock_actual')
                 ->label('Stock disponible')
                 ->content(function ($get) {
@@ -106,15 +96,15 @@ class MovimientoInventarioRelationManager extends RelationManager
                         ->where('catinventario_id', $get('catinventario_id'))
                         ->first()?->cantidad_actual ?? 'No disponible';
                 }),
-
             Select::make('tipo_movimiento')
                 ->label('Tipo de Movimiento')
                 ->options([
-                    'Compra' => '🟢 Entrada - Compra',
-                    'Donacion' => '🟢 Entrada - Donación',
+                    'Compra' => '🟢 Entrada - Compra'
                 ])
+                ->default("Compra")
+                ->disabled()
+                ->dehydrated(true)
                 ->required(),
-
             Select::make('user_id')
                 ->label('Usuario')
                 ->options(User::pluck('name', 'id'))
@@ -122,12 +112,10 @@ class MovimientoInventarioRelationManager extends RelationManager
                 ->default(Filament::auth()->id())
                 ->disabled()
                 ->dehydrated(true),
-
             TextInput::make('cantidad_usar')
                 ->label('Cantidad del movimiento')
                 ->numeric()
                 ->required(),
-
             Textarea::make('comentario')
                 ->label('Comentario')
                 ->maxLength(255),
@@ -136,7 +124,6 @@ class MovimientoInventarioRelationManager extends RelationManager
             try {
             // Se Crea el movimiento, la lógica esta en el modelo de Movimiento Inventario
             $movimiento = MovimientoInventario::create($data);
-
             // Verificar si se guardó correctamente- Manejo de errores
             if ($movimiento) {
                 Notification::make()
@@ -154,12 +141,11 @@ class MovimientoInventarioRelationManager extends RelationManager
                 ->send();
             }
         }),
-/*-------------------------------------------------------------------BOTÓN DE 🔴SALIDA------------------------------- */
-    Tables\Actions\Action::make('salida')
-        ->label('🔴 Salida')
-        ->form([
+/*-------------------------------------------------------------------BOTÓN DE 🔴SALIDA----------------------------------------------------------------- */
+        Tables\Actions\Action::make('salida')
+            ->label('🔴 Salida')
+            ->form([
             Select::make('aerodromo_id')
-            //AERODROMO ESCOGIDO
                 ->label('Aeródromo')
                 ->options(Aerodromo::pluck('nombre', 'id'))
                 ->required()
@@ -168,7 +154,6 @@ class MovimientoInventarioRelationManager extends RelationManager
                 ->afterStateUpdated(fn (callable $set) => $set('catinventario_id', null))
                 ->disabled()
                 ->dehydrated(true),
-            //MUNICION ESCOGIDA
             Select::make('catinventario_id')
                 ->label('Equipo')
                 ->options(CatalogoInventario::pluck('nombre', 'id'))
@@ -177,7 +162,6 @@ class MovimientoInventarioRelationManager extends RelationManager
                 ->default(fn (RelationManager $livewire) => $livewire->getOwnerRecord()->catinventario_id)
                 ->disabled()
                 ->dehydrated(true),
-            //STOCK ACTUAL PARA QUE EL USUARIO VEA CUANTO HAY DISPONIBLE
             Placeholder::make('stock_actual')
                 ->label('Stock disponible')
                 ->content(function ($get) {
@@ -185,7 +169,6 @@ class MovimientoInventarioRelationManager extends RelationManager
                         ->where('catinventario_id', $get('catinventario_id'))
                         ->first()?->cantidad_actual ?? 'No disponible';
                 }),
-            //TIPO DE MOVIMIENTO EN SALIDA
             Select::make('tipo_movimiento')
                 ->label('Tipo de Movimiento')
                 ->options([
@@ -193,7 +176,6 @@ class MovimientoInventarioRelationManager extends RelationManager
                     'Baja' => '🔴 Salida - Baja',
                 ])
                 ->required(),
-            //USUARIO YA REGISTRADO PREVIAMENTE EN EL FILAMENT
             Select::make('user_id')
                 ->label('Usuario')
                 ->options(User::pluck('name', 'id'))
@@ -201,17 +183,14 @@ class MovimientoInventarioRelationManager extends RelationManager
                 ->default(Filament::auth()->id())
                 ->disabled()
                 ->dehydrated(true),
-            //CANTIDAD A USAR, EN ESTE CASO PARA LA SALIDA
             TextInput::make('cantidad_usar')
                 ->label('Cantidad del movimiento')
                 ->numeric()
                 ->required(),
-            //COMENTARIO OPCIONAL
             Textarea::make('comentario')
                 ->label('Comentario')
                 ->maxLength(255),
         ])
-        //MAEJO DE ERRORES
         ->action(function (array $data) {
             try {
         // Se Crea el movimiento, la lógica esta en el modelo de Movimiento Inventario
@@ -238,7 +217,6 @@ class MovimientoInventarioRelationManager extends RelationManager
     Tables\Actions\Action::make('ajuste')
             ->label('⚙ Ajuste')
             ->form([
-            //SELECCIONA YA EL ID DEL AERODROMO SELECCIONADO PREVIAMENTE PARA QUE EL USUARIO NO LO CAMBIE
             Select::make('aerodromo_id')
             ->label('Aeródromo')
             ->options(Aerodromo::pluck('nombre', 'id'))
@@ -246,7 +224,6 @@ class MovimientoInventarioRelationManager extends RelationManager
             ->default(fn (RelationManager $livewire) => $livewire->getOwnerRecord()->aerodromo_id)
             ->disabled()
             ->dehydrated(true),
-            //SELECCION PREVIA DEL CATALOGO DE MUNICION
             Select::make('catinventario_id')
                 ->label('Equipo')
                 ->options(CatalogoInventario::pluck('nombre', 'id'))
@@ -254,17 +231,15 @@ class MovimientoInventarioRelationManager extends RelationManager
                 ->default(fn (RelationManager $livewire) => $livewire->getOwnerRecord()->catinventario_id)
                 ->disabled()
                 ->dehydrated(true),
-            //SELECCION DE TIPO DE MOVIMIENTO EN ESTE CASO, AJUSTE PARA GUARDARLO EN EL TABLA DE AJUSTE
             Select::make('tipo_movimiento')
                 ->label('Tipo de Movimiento')
                 ->options([
                     'ajuste' => 'Ajuste',
                 ])
-                ->default('Ajuste')
+                ->default('ajuste')
                 ->required()
                 ->disabled()
                 ->dehydrated(true),
-            //OBTIENE EL STOCK ACTUAL PARA QUE EL USUARIO VEA CUANTO HAY DISPONIBLE DEL ARTICULO SELECCIONADO
             Placeholder::make('stock_actual')
                 ->label('Stock Actual')
                 ->content(function ($get) {
@@ -272,12 +247,10 @@ class MovimientoInventarioRelationManager extends RelationManager
                         ->where('catinventario_id', $get('catinventario_id'))
                         ->first()?->cantidad_actual ?? 'No disponible';
                 }),
-            //LA NUEVA CANTIDAD PARA EL STOCK
             TextInput::make('cantidad_ajustada')
                 ->label('Nuevo stock ajustado')
                 ->numeric()
                 ->required(),
-            //OBTIENE EL ID DEL USUARIO YA REGISTRADO EN EL MISMO FILAMENT
             Select::make('user_id')
                 ->label('Usuario')
                 ->options(User::pluck('name', 'id'))
@@ -324,10 +297,10 @@ class MovimientoInventarioRelationManager extends RelationManager
                 ->send();
             }
         }),
+/*----------------------------------------TRANSFERENCIA ENTRE AERODROMOS-----------------------------------------------------------------*/
         Tables\Actions\Action::make('transferir')
         ->label('✈️Transferir')
         ->form([
-
         Grid::make(2)->schema([
             Select::make('aerodromo_origen_id')
                 ->label('Aeródromo')
@@ -381,23 +354,21 @@ class MovimientoInventarioRelationManager extends RelationManager
                 ->maxLength(255),
         ]),
     ])
+        ->action(function (array $data) {
+            try {
+            TransferenciaMuniciones::transferir($data);
 
-
-            ->action(function (array $data) {
-                try {
-                TransferenciaMuniciones::transferir($data);
-
-                Notification::make()
-                    ->title('Transferencia realizada correctamente.')
-                    ->success()
-                    ->send();
-            } catch (\Exception $e) {
-                Notification::make()
-                    ->title('Error: ' . $e->getMessage())
-                    ->danger()
-                    ->send();
-            }
-            })
+            Notification::make()
+                ->title('Transferencia realizada correctamente.')
+                ->success()
+                ->send();
+        } catch (\Exception $e) {
+            Notification::make()
+                ->title('Error: ' . $e->getMessage())
+                ->danger()
+                ->send();
+        }
+        })
     /*------------------------------------------*/
             ])
             ->bulkActions([

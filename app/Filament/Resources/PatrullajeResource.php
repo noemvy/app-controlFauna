@@ -54,13 +54,16 @@ class PatrullajeResource extends Resource
                     ->required()
                     ->default('en_proceso')
                     ->reactive(),
-
             Forms\Components\TextInput::make('inicio')
                     ->label('Inicio')
                     ->default(Carbon::now('America/Panama')->format('Y-m-d H:i:s'))
                     ->required()
                     ->disabled()
                     ->dehydrated(true),
+            Forms\Components\TextArea::make('comentarios')
+                    ->label('Comentarios')
+                    ->maxLength(250)
+                    ->columnSpanFull(),
             /*EL CAMPO FIN ESTA EN EL ARCHIVO CreatePatrullaje */
             Forms\Components\Section::make('Acciones')
                     ->schema([
@@ -81,9 +84,8 @@ class PatrullajeResource extends Resource
         return "Total: {$count} intervención(es) creadas";
     }),
 
-
-                    ])
-            ]);
+    ])
+ ]);
     }
     public static function table(Table $table): Table
     {
