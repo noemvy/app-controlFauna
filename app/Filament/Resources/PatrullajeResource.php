@@ -100,11 +100,6 @@ class PatrullajeResource extends Resource
             ])
             ->filters([
                 //
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
             ]);
     }
     public static function getRelations(): array
