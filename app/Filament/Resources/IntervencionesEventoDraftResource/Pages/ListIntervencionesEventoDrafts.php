@@ -12,6 +12,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Storage;
 use Filament\Actions\Action;
+use Filament\Forms;
 
 class ListIntervencionesEventoDrafts extends ListRecords
 {
@@ -24,10 +25,28 @@ class ListIntervencionesEventoDrafts extends ListRecords
             Actions\CreateAction::make('Nueva intervención')
                 ->label('Nueva Interveción'),
             Action::make('exportReports')
-                ->label('Reportes en Excel')
+                ->label('Descargar Excel')
                 ->icon('lucide-file-x-2')
                 ->color('info')
-                ->action(function () {
+            ->form([
+            Forms\Components\Select::make('tipo_evento')
+            ->label('Tipo de Evento')
+            ->options([
+                'Disperción' => 'Disperción',
+                'Recogida' => 'Recogida',
+            ])
+            ->placeholder('Tipo Evento'),
+            Forms\Components\Select::make('origen')
+            ->label('Origen del Reporte')
+            ->options([
+                'TWR' => 'TWR',
+                'SSEI'=>'SSEI',
+                'AVSEC'=>'AVSEC',
+            ])
+            ->placeholder('Origen')
+        ])
+
+        ->action(function (array $data) {
                     $spreadsheet = new Spreadsheet();
                     $sheet = $spreadsheet->getActiveSheet();
         // Encabezados
@@ -66,8 +85,19 @@ class ListIntervencionesEventoDrafts extends ListRecords
             'atractivo',
             'pivoteEvento.catalogoInventario.acciones',
             'actualizacionesEvento.user' // Relación para traer usuario de actualizaciones
-        ])->get();
+        ]) ->when($data['tipo_evento'] ?? null, fn ($query, $tipo) => $query->where('tipo_evento', $tipo))
+            ->when($data['origen'] ?? null, fn ($query, $origen) => $query->where('origen', $origen))
+            ->get();
 
+        if ($reportes->isEmpty()) {
+        \Filament\Notifications\Notification::make()
+            ->title('Sin resultados')
+            ->body('No hay datos disponibles para descargar')
+            ->warning()
+            ->send();
+
+        return;
+    }
         $row = 2;
 
         foreach ($reportes as $reporte) {
