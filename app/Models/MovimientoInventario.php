@@ -14,6 +14,7 @@ class MovimientoInventario extends Model
         'tipo_movimiento',
         'cantidad_usar',
         'comentario',
+        'transferencia_id'
     ];
 
     protected $table = 'movimiento_inventario';
@@ -33,42 +34,42 @@ class MovimientoInventario extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+    public function transferencia()
+{
+    return $this->belongsTo(TransferenciaMuniciones::class, 'transferencia_id');
+}
+
+
+
+
 
     /*------------------ METODO PARA REGISTRAR MOVIMIENTO ------------------*/
-  protected static function booted()
-{
-    static::creating(function ($movimiento) {
-        self::ajustarInventario($movimiento);
-    });
-}
-protected static function ajustarInventario($movimiento)
-{
-    $inventario = InventarioMuniciones::where('aerodromo_id', $movimiento->aerodromo_id)
-        ->where('catinventario_id', $movimiento->catinventario_id)
-        ->first();
-
-    if (! $inventario) {
-        throw new \Exception("Inventario no encontrado para este aeródromo y categoría.");
+    protected static function booted()
+    {
+        static::creating(function ($movimiento) {
+            self::ajustarInventario($movimiento);
+        });
     }
+    protected static function ajustarInventario($movimiento)
+    {
+        $inventario = InventarioMuniciones::where('aerodromo_id', $movimiento->aerodromo_id)
+            ->where('catinventario_id', $movimiento->catinventario_id)
+            ->first();
 
-    $tiposEntrada = ['Compra', 'Donacion'];
+        $tiposEntrada = ['Compra'];
 
-    if (in_array($movimiento->tipo_movimiento, $tiposEntrada)) {
+        if (in_array($movimiento->tipo_movimiento, $tiposEntrada)) {
 
-        $inventario->cantidad_actual += $movimiento->cantidad_usar;
-    } else {
+            $inventario->cantidad_actual += $movimiento->cantidad_usar;
+        } else {
 
-        if ($inventario->cantidad_actual < $movimiento->cantidad_usar) {
-            throw new \Exception("No hay stock suficiente para realizar esta salida.");
+            if ($inventario->cantidad_actual < $movimiento->cantidad_usar) {
+                throw new \Exception("No hay stock suficiente para realizar esta salida.");
+            }
+
+            $inventario->cantidad_actual -= $movimiento->cantidad_usar;
         }
 
-        $inventario->cantidad_actual -= $movimiento->cantidad_usar;
+        $inventario->save();
     }
-
-    $inventario->save();
-}
-
-
-
-
 }

@@ -12,9 +12,6 @@ class InventarioMuniciones extends Model
         'cantidad_minima',
 
     ];
-
-
-
     /*---------------------------------------------RELACIONES CON OTROS MODELOS--------------------------------------------------*/
     //Relacion con Aerodromo
         public function aerodromo()

@@ -25,10 +25,6 @@ class IntervencionesEventoDraft extends Model
         'dispersados',
         'fotos',
         'comentarios',
-        'municion_utilizada',
-        'catinventario_id',
-        'acciones_id',
-        'cantidad_utilizada',
     ];
     protected $casts = [
         'coordenada_x' => 'decimal:6',
@@ -37,7 +33,6 @@ class IntervencionesEventoDraft extends Model
         'viento' => 'float',
         'humedad' => 'float',
         'fotos' => 'array',
-        'municion_utilizada' => 'array',
     ];
     // Relaciones
 
@@ -81,13 +76,16 @@ class IntervencionesEventoDraft extends Model
     {
             return $this->belongsTo(Evento::class,);
     }
-        public function actualizacionesEvento()
+
+    public function actualizacionesEvento()
     {
         return $this->morphMany(ActualizacionesReporte::class, 'reportable');
     }
 
-
-
+    public function pivoteEvento()
+    {
+        return $this->hasMany(\App\Models\PivoteEvento::class, 'intervencion_id');
+    }
 
 
 

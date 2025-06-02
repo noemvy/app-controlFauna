@@ -14,10 +14,6 @@ class IntervencionesDraft extends Model
     protected $fillable = [
         'user_id',
         'especies_id',
-        'catinventario_id',
-        'cantidad_utilizada',
-        'municion_utilizada',
-        'acciones_id',
         'atractivos_id',
         'guardado',
         'vistos',
@@ -41,7 +37,6 @@ class IntervencionesDraft extends Model
         'temperatura' => 'float',
         'viento' => 'float',
         'humedad' => 'float',
-        'municion_utilizada' => 'array',
 
 
     ];
@@ -67,10 +62,11 @@ class IntervencionesDraft extends Model
         return $this->belongsTo(Atractivo::class, 'atractivos_id');
     }
 
-    public function inventarioMuniciones()
+public function pivote()
 {
-    return $this->hasMany(IntervencionesDraft::class);
+    return $this->hasMany(PivotePatrullajeIntervencion::class, 'intervencion_draft_id');
 }
+
 
 
 public function patrullaje()

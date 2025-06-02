@@ -12,11 +12,7 @@ class Intervenciones extends Model
 
     protected $fillable = [
         'especies_id',
-        'catinventario_id',
-        'acciones_id',
         'atractivos_id',
-        'cantidad_utilizada',
-        'guardado',
         'vistos',
         'sacrificados',
         'dispersados',
@@ -32,7 +28,6 @@ class Intervenciones extends Model
 
     protected $casts = [
         'fotos' => 'array',
-        'municion_utilizada' => 'array', /*Uso de esto para capturar los datos del repeater en el resource de IntervencionesDraft */
     ];
 
     // Relación con Especie
@@ -71,6 +66,10 @@ class Intervenciones extends Model
         return $this->belongsTo(Patrullaje::class);
     }
 
+    public function pivote()
+{
+    return $this->hasMany(\App\Models\PivotePatrullajeIntervencion::class, 'intervencion_id');
+}
 
 }
 
