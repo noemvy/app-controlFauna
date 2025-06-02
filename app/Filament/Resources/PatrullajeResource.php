@@ -75,17 +75,17 @@ class PatrullajeResource extends Resource
                     ->color('success')
                     ]),
                     Forms\Components\Placeholder::make('conteoIntervenciones')
-    ->label('')
-    ->content(function () {
-        $userId = Filament::auth()->id();
+                    ->label('')
+                    ->content(function () {
+                        $userId = Filament::auth()->id();
 
-        $count = \App\Models\IntervencionesDraft::where('user_id', $userId)->count();
+                        $count = \App\Models\IntervencionesDraft::where('user_id', $userId)->count();
 
-        return "Total: {$count} intervención(es) creadas";
-    }),
+                        return "Total: {$count} intervención(es) creadas";
+                    }),
 
-    ])
- ]);
+            ])
+        ]);
     }
     public static function table(Table $table): Table
     {
@@ -94,8 +94,7 @@ class PatrullajeResource extends Resource
                 Tables\Columns\TextColumn::make('user.name')->label('Usuario'),
                 Tables\Columns\TextColumn::make('inicio')->label('Hora de Inicio'),
                 Tables\Columns\TextColumn::make('fin')->label('Hora de Finalización'),
-
-            ])
+            ])->defaultSort('created_at', 'desc')
             ->actions([
                 Tables\Actions\ViewAction::make(),
             ])
