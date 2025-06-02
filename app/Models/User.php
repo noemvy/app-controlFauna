@@ -63,4 +63,5 @@ class User extends Authenticatable
     {
         return true; // Permite que todos los usuarios accedan al panel
     }
+    
 }
