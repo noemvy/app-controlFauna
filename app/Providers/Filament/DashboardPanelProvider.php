@@ -42,8 +42,8 @@ class DashboardPanelProvider extends PanelProvider
                     'warning' => Color::Amber,
             ])
             ->widgets([
-                PatrullajeStats::class,
-                EstadisticaEspeciesChart::class,
+                PatrullajeStats::class
+                // EstadisticaEspeciesChart::class,
             ])
             ->darkMode(false)
             ->renderHook('panels::body.start', fn()=>'
