@@ -32,138 +32,162 @@ class IntervencionesDraftResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Select::make('user_id')
-                ->label('Usuario')
-                ->options(User::pluck('name', 'id'))
-                ->required()
-                ->default(Filament::auth()->id())
-                ->disabled()
-                ->dehydrated(true),
-
-            TextInput::make('coordenada_x')
-                ->label('Coordenada X')
-                ->numeric()
-                ->step(0.000001)
-                ->disabled()
-                ->dehydrated()
-                ->default(fn () => number_format(data_get(static::getWeatherData(), 'coord.lat', 0), 8, '.', '')),
-
-            TextInput::make('coordenada_y')
-                ->label('Coordenada Y')
-                ->numeric()
-                ->step(0.000001)
-                ->disabled()
-                ->dehydrated()
-                ->default(fn () => number_format(data_get(static::getWeatherData(), 'coord.lon', 0), 8, '.', '')),
-
-            TextInput::make('temperatura')
-                ->label('Temperatura')
-                ->suffix('°C')
-                ->disabled()
-                ->dehydrated()
-                ->default(fn () => data_get(static::getWeatherData(), 'main.temp')),
-
-            TextInput::make('viento')
-                ->label('Viento')
-                ->suffix('m/s')
-                ->numeric()
-                ->disabled()
-                ->dehydrated()
-                ->default(fn () => data_get(static::getWeatherData(), 'wind.speed')),
-
-            TextInput::make('humedad')
-                ->label('Humedad')
-                ->suffix('%')
-                ->disabled()
-                ->dehydrated()
-                ->default(fn () => data_get(static::getWeatherData(), 'main.humidity')),
-
-            Select::make('grupos_id')
-                ->label('Grupo')
-                ->options(Grupo::orderBy('nombre')->pluck('nombre', 'id'))
-                ->reactive()
-                ->afterStateUpdated(fn (callable $set) => $set('especies_id', null)),
-
-            Select::make('especies_id')
-                ->label('Especie')
-                ->options(function (callable $get) {
-                    $grupoId = $get('grupos_id');
-                    return $grupoId
-                        ? Especie::where('grupos_id', $grupoId)->orderBy('nombre_cientifico')->pluck('nombre_cientifico', 'id')
-                        : [];
-                })
-                ->searchable()
-                ->required()
-                ->disabled(fn (callable $get) => !$get('grupos_id')),
-
-            Select::make('atractivos_id')
-                ->label('Atractivo')
-                ->options(Atractivo::pluck('nombre', 'id'))
-                ->searchable()
-                ->required(),
-
-            Select::make('vistos')
-                ->label('Vistos')
-                ->options(self::getCantidadOptions())
-                ->placeholder('Seleccione una cantidad'),
-
-            Select::make('sacrificados')
-                ->label('Sacrificados')
-                ->options(self::getCantidadOptions())
-                ->placeholder('Seleccione una cantidad'),
-
-            Select::make('dispersados')
-                ->label('Dispersados')
-                ->options(self::getCantidadOptions())
-                ->placeholder('Seleccione una cantidad'),
-
-            FileUpload::make('fotos')
-                ->label('Fotos')
-                ->multiple()
-                ->disk('public')
-                ->directory('intervenciones')
-                ->preserveFilenames()
-                ->reorderable()
-                ->nullable(),
-
-            Textarea::make('comentarios')
-                ->label('Comentarios')
-                ->nullable(),
-
-            Forms\Components\Repeater::make('municion_utilizada')
-                ->label('Municiones Utilizadas')
-                ->schema([
-                Forms\Components\Select::make('aerodromo_id')
-                ->label('Aeropuerto')
-                ->options(Aerodromo::pluck('nombre', 'id'))
-                ->required()
-                ->default(Filament::auth()->user()->aerodromo_id)
-                ->disabled()
-                ->dehydrated(true),
-                    Select::make('catinventario_id')
-                        ->label('Herramienta Utilizada')
-                        ->options(CatalogoInventario::pluck('nombre', 'id'))
-                        ->searchable()
-                        ->required()
-                        ->reactive()
-                        ->afterStateUpdated(function (callable $set, $state) {
-                            $accionId = CatalogoInventario::where('id', $state)->value('acciones_id');
-                            $set('acciones_id', $accionId);
-                        }),
-
-                    Select::make('acciones_id')
-                        ->label('Tipo de Acción')
-                        ->options(Acciones::pluck('nombre', 'id'))
-                        ->required()
-                        ->disabled()
-                        ->dehydrated(true),
-
-                    TextInput::make('cantidad_utilizada')
-                        ->label('Cantidad utilizada')
-                        ->numeric()
-                        ->required(),
-                ])
-                ->columnSpanFull(),
+        /*--------------------------------------------------Datos del Evento----------------------------------*/
+        Forms\Components\Section::make('Datos del Evento')
+        ->schema([
+        Forms\Components\Select::make('tipo_evento')
+            ->label('Tipo de Evento')
+            ->options([
+                'Dispersión'=>'Dispersión',
+                'Recogida' => 'Recogida'
+            ])
+            ->required(),
+        Forms\Components\Select::make('origen')
+            ->label('Origen del Reporte')
+            ->options([
+                'TWR' => 'TWR',
+                'SSEI'=>'SSEI',
+                'AVSEC'=>'AVSEC',
+            ])
+            ->required(),
+        ])->columns(2),
+/*-----------------------------------------Datos de las especies🦜--------------------------------------*/
+        Forms\Components\Section::make('Datos de la Fauna')
+            ->schema([
+        Forms\Components\Select::make('grupos_id')
+            ->label('Grupo')
+            ->options(Grupo::orderBy('nombre')->pluck('nombre', 'id'))
+            ->reactive()
+            ->required()
+            ->afterStateUpdated(fn (callable $set) => $set('especies_id', null)),
+        Forms\Components\Select::make('especies_id')
+            ->label('Especie')
+            ->options(function (callable $get) {
+                $grupoId = $get('grupos_id');
+                if (!$grupoId) {
+                    return [];
+                }
+                return Especie::where('grupos_id', $grupoId)->orderBy('nombre_cientifico')->pluck('nombre_cientifico', 'id');
+            })
+            ->searchable()
+            ->required()
+            ->disabled(fn (callable $get) => !$get('grupos_id')),
+        Forms\Components\Select::make('atractivos_id')
+            ->label('Atractivo')
+            ->options(Atractivo::pluck('nombre', 'id'))
+            ->searchable()
+            ->required(),
+        Forms\Components\Select::make('vistos')
+            ->options(self::getCantidadOptions())
+            ->label('Vistos')
+            ->placeholder('Seleccione una cantidad'),
+        Forms\Components\Select::make('sacrificados')
+            ->label('Sacrificados')
+            ->options(self::getCantidadOptions())
+            ->placeholder('Seleccione una cantidad'),
+        Forms\Components\Select::make('dispersados')
+            ->label('Dispersados')
+            ->options(self::getCantidadOptions())
+            ->placeholder('Seleccione una cantidad'),
+        Forms\Components\FileUpload::make('fotos')
+            ->label('Fotos')->multiple()
+            ->maxFiles(5)->image()
+            ->disk('public')->directory('intervenciones')
+            ->preserveFilenames()->reorderable()
+            ->nullable()->columnSpanFull(),
+        ])->columns(3),
+/*-----------------------------------------Datos del clima⛅--------------------------------------------*/
+        Forms\Components\Section::make('Datos del Clima y Ubicación')
+        ->schema([
+        Forms\Components\TextInput::make('coordenada_x')
+            ->label('Coordenada X')
+            ->numeric()
+            ->step(0.000001)
+            ->disabled()
+            ->dehydrated(true)
+            ->default(fn() => data_get(static::getWeatherData(), 'coord.lat')
+                ? number_format(data_get(static::getWeatherData(), 'coord.lat'), 8, '.', '')
+                : null),
+        Forms\Components\TextInput::make('coordenada_y')
+            ->label('Coordenada Y')
+            ->numeric()
+            ->disabled()
+            ->step(0.000001)
+            ->dehydrated(true)
+            ->default(fn() => data_get(static::getWeatherData(), 'coord.lon')
+                ? number_format(data_get(static::getWeatherData(), 'coord.lon'), 8, '.', '')
+                : null),
+        Forms\Components\TextInput::make('temperatura')
+            ->label('Temperatura')
+            ->suffix('°C')
+            ->disabled()
+            ->dehydrated(true)
+            ->default(fn() => data_get(static::getWeatherData(),'main.temp')),
+        Forms\Components\TextInput::make('viento')
+            ->label('Viento')
+            ->numeric()
+            ->disabled()
+            ->dehydrated(true)
+            ->suffix('m/s')
+            ->default(fn() => data_get(static::getWeatherData(),'wind.speed')),
+        Forms\Components\TextInput::make('humedad')
+            ->label('Humedad')
+            ->suffix('%')
+            ->disabled()
+            ->dehydrated(true)
+            ->default(fn() => data_get(static::getWeatherData(),'main.humidity')),
+        ])->columns(5),
+/*----------------------------------------------------SECCIÓN PARA ESCOGER LA CANTIDAD DE MUNICIONES USADAS-------------------------------------------------- */
+        Forms\Components\Section::make('Equipo Utilizado')
+            ->schema([
+        Forms\Components\Repeater::make('municion_utilizada')
+            ->label('')
+            ->schema([
+        Forms\Components\Grid::make(4) // Agrupamos en una fila de 4 columnas
+            ->schema([
+        Forms\Components\Select::make('aerodromo_id')
+            ->label('Aeropuerto')
+            ->options(Aerodromo::pluck('nombre', 'id'))
+            ->required()
+            ->default(Filament::auth()->user()->aerodromo_id)
+            ->disabled()
+            ->dehydrated(true),
+        Forms\Components\Select::make('catinventario_id')
+            ->label('Herramienta Utilizada:')
+            ->options(CatalogoInventario::pluck('nombre', 'id'))
+            ->searchable()
+            ->reactive()
+            ->required()
+            ->dehydrated()
+            ->afterStateUpdated(function (callable $set, $state) {
+                $accionId = CatalogoInventario::where('id', $state)->value('acciones_id');
+                $set('acciones_id', $accionId);
+            }),
+        Forms\Components\Select::make('acciones_id')
+            ->label('Tipo de Acción Realizada:')
+            ->options(Acciones::pluck('nombre', 'id'))
+            ->searchable()
+            ->required()
+            ->disabled()
+            ->dehydrated(),
+        Forms\Components\TextInput::make('cantidad_utilizada')
+            ->label('Cantidad a utilizar')
+            ->numeric()
+            ->required(),
+            ]),
+        ])->defaultItems(1)->reorderable(false)
+        ])->columns(1)->columnSpanFull(),
+        /*----------------------------------Datos de comentarios y usuario--------------------------------------*/
+        Forms\Components\Section::make('Comentarios y Usuario')
+            ->schema([
+        Forms\Components\Textarea::make('comentarios')->label('Comentarios')->nullable(),
+        Forms\Components\Select::make('user_id')->label('Usuario')
+            ->options(User::pluck('name', 'id'))
+            ->required()
+            ->default(Filament::auth()->id())
+            ->disabled()
+            ->dehydrated(true),
+            ])
         ]);
     }
 
@@ -231,11 +255,11 @@ class IntervencionesDraftResource extends Resource
             '8' => '8 (8)',
             '9' => '9 (9)',
             '10' => '10 (10)',
-            '15' => '15 (11–20)',
-            '25' => '25 (21–30)',
-            '35' => '35 (31–40)',
-            '45' => '45 (41–50)',
-            '63' => '63 (51–75)',
+            '15 (11–20)' => '15 (11–20)',
+            '25 (21–30)' => '25 (21–30)',
+            '35 (31–40)' => '35 (31–40)',
+            '45 (41–50)' => '45 (41–50)',
+            '63 (51–75)' => '63 (51–75)',
         ];
     }
 }
