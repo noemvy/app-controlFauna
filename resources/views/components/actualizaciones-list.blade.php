@@ -19,7 +19,7 @@
                     {{ $actualizacion->actualizacion }}
                 </p>
                 <small style="display: block; font-size: 14px; color: #666;">
-                    Por: <strong>{{ $actualizacion->autor }}</strong>
+                    Por: <strong>{{ $actualizacion->user->name }}</strong>
                     el <strong>{{ $actualizacion->created_at->format('d-m-Y H:i:s') }}</strong>
                 </small>
             </div>
