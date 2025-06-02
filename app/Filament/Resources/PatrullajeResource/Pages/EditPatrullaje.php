@@ -63,7 +63,7 @@ class EditPatrullaje extends EditRecord
     }),
 
 
-            Action::make('cancelar')
+    Action::make('cancelar')
     ->label('Cancelar Patrullaje')
     ->color('danger')
     ->requiresConfirmation()
