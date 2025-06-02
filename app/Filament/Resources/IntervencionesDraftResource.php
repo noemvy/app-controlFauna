@@ -143,7 +143,7 @@ class IntervencionesDraftResource extends Resource
         Forms\Components\Repeater::make('municion_utilizada')
             ->label('')
             ->schema([
-        Forms\Components\Grid::make(4) // Agrupamos en una fila de 4 columnas
+        Forms\Components\Grid::make(4)
             ->schema([
         Forms\Components\Select::make('aerodromo_id')
             ->label('Aeropuerto')
@@ -160,8 +160,9 @@ class IntervencionesDraftResource extends Resource
             ->required()
             ->dehydrated()
             ->afterStateUpdated(function (callable $set, $state) {
-                $accionId = CatalogoInventario::where('id', $state)->value('acciones_id');
-                $set('acciones_id', $accionId);
+                $inventario = CatalogoInventario::find($state);
+                $set('acciones_id', $inventario?->acciones_id);
+                $set('es_consumible', $inventario?->es_consumible);
             }),
         Forms\Components\Select::make('acciones_id')
             ->label('Tipo de Acción Realizada:')
@@ -170,10 +171,13 @@ class IntervencionesDraftResource extends Resource
             ->required()
             ->disabled()
             ->dehydrated(),
+        Forms\Components\Hidden::make('es_consumible')
+        ->dehydrated(false),
         Forms\Components\TextInput::make('cantidad_utilizada')
             ->label('Cantidad a utilizar')
             ->numeric()
-            ->required(),
+            ->required(fn (callable $get) => $get('es_consumible') === 1)
+            ->visible(fn (callable $get) => $get('es_consumible') === 1),
             ]),
         ])->defaultItems(1)->reorderable(false)
         ])->columns(1)->columnSpanFull(),
