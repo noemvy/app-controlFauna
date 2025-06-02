@@ -335,7 +335,7 @@ class ReporteImpactoAviarResource extends Resource
                 Tables\Columns\TextColumn::make('fecha')
                     ->label('Fecha de Impacto')
                     ->dateTime('d/m/Y'),
-            ])
+            ])->defaultSort('created_at', 'desc')
             ->filters([
                 //
             ])
