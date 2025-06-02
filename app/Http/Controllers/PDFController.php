@@ -25,7 +25,8 @@ class PDFController extends Controller
             'especie',
             'partesGolpeadas',
             'partesDanadas',
-            'user'
+            'user',
+            'actualizaciones',
         ])->findOrFail($id);
 
         // Obtener relaciones ya cargadas o colecciones vacías
