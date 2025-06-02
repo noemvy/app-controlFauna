@@ -29,10 +29,6 @@ return new class extends Migration
             $table->string('dispersados')->nullable();
             $table->json('fotos')->nullable();
             $table->text('comentarios')->nullable();
-            $table->json('municion_utilizada')->nullable();
-            $table->foreignId('catinventario_id')->constrained('catalogo_inventarios')->onDelete('cascade');
-            $table->foreignId('acciones_id')->constrained('acciones')->onDelete('cascade');
-            $table->json('cantidad_utilizada')->nullable();
             $table->timestamps();
         });
     }
@@ -42,15 +38,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-
-        Schema::table('intervenciones_evento_draft', function (Blueprint $table) {
-        $table->dropForeign(['acciones_id']);
-        $table->dropColumn('acciones_id');
-                });
-        Schema::table('intervenciones_evento_draft', function (Blueprint $table) {
-        $table->dropForeign(['catinventario_id']);
-        $table->dropColumn('catinventario_id');
-        });
         Schema::table('intervenciones_evento_draft', function (Blueprint $table) {
         $table->dropForeign(['atractivos_id']);
         $table->dropColumn('atractivos_id');
@@ -64,7 +51,7 @@ return new class extends Migration
         $table->dropColumn('user_id');
                 });
 
-       Schema::dropIfExists('intervenciones_evento_draft');
+        Schema::dropIfExists('intervenciones_evento_draft');
 
     }
 };
