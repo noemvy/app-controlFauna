@@ -44,7 +44,6 @@ class TransferenciaMuniciones extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    // (Opcional) Relación con los movimientos si deseas registrar uno por transferencia
     public function movimientos()
     {
         return $this->hasMany(MovimientoInventario::class, 'catinventario_id', 'catinventario_id')
@@ -53,8 +52,6 @@ class TransferenciaMuniciones extends Model
                     ->orWhere('aerodromo_id', $this->aerodromo_destino_id);
             });
     }
-
-
 
 /*--------------------------------------------------------FUNCION DE TRANSFERENCIA ENTRE AEROPUERTOS--------------------------------------------------------------------------------*/
         public static function transferir(array $data): bool
@@ -99,10 +96,11 @@ class TransferenciaMuniciones extends Model
             MovimientoInventario::create([
                 'aerodromo_id' => $transferencia->aerodromo_origen_id,
                 'catinventario_id' => $transferencia->catinventario_id,
-                'tipo_movimiento' => 'transferencia',
+                'tipo_movimiento' => 'Transferencia',
                 'user_id' => $transferencia->user_id,
                 'cantidad_usar' => 0,
                 'comentarios' => 'Transferencia hacia aeropuerto ID: ' . $transferencia->aerodromo_destino_id,
+                'transferencia_id' => $transferencia->id, // 👈 Aquí
             ]);
 
             // Registrar movimiento de entrada para que guarde como tipo de movimiento de transferencia en la tabla movimiento y cuente como movimiento de entrada en
@@ -110,10 +108,11 @@ class TransferenciaMuniciones extends Model
             MovimientoInventario::create([
                 'aerodromo_id' => $transferencia->aerodromo_destino_id,
                 'catinventario_id' => $transferencia->catinventario_id,
-                'tipo_movimiento' => 'transferencia',
+                'tipo_movimiento' => 'Transferencia',
                 'user_id' => $transferencia->user_id,
                 'cantidad_usar' => 0,
                 'comentarios' => 'Transferencia desde aeropuerto ID: ' . $transferencia->aerodromo_origen_id,
+                'transferencia_id' => $transferencia->id, // 👈 Aquí
             ]);
 
         });
