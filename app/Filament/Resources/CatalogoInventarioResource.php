@@ -42,16 +42,22 @@ class CatalogoInventarioResource extends Resource
 
 
                 Forms\Components\Select::make('categoria_equipo')
-                    ->label('Tipo de Equipo')
+                    ->label('Categoria Equipo')
                     ->options([
                         'Armas' => 'Armas',
                         'Municiones' => 'Municiones',
                         'Instrumento' => 'Instrumento',
                     ])
                     ->required(),
+                Forms\Components\Select::make('tipo')
+                    ->label('Tipo de Equipo')
+                    ->options([
+                        'Consumible' => 'Consumible',
+                        'No Consumible' => 'No Consumible',
+                    ])
+                    ->required(),
                 Forms\Components\TextInput::make('descripcion')
                     ->label('Descripción del equipo')
-                    ->required()
                     ->maxLength(200),
                 Forms\Components\Select::make('estado')
                     ->label('Estado')
@@ -69,11 +75,7 @@ class CatalogoInventarioResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('nombre')->label('Nombre Herramienta')
-                ->searchable(),
-                Tables\Columns\TextColumn::make('descripcion')
-                ->searchable(),
-                Tables\Columns\TextColumn::make('cantidad_stock')
+                Tables\Columns\TextColumn::make('nombre')->label('Nombre')
                 ->searchable(),
                 Tables\Columns\IconColumn::make('estado')
                     ->label('Activo')
@@ -82,19 +84,14 @@ class CatalogoInventarioResource extends Resource
                     ->falseIcon('heroicon-o-x-circle') // Ícono para falso
                     ->trueColor('success') // Color para verdadero
                     ->falseColor('danger'), // Color para falso
-            ])
+            ])->defaultSort('created_at', 'desc')
+            ->searchable()
+
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-
-                    Tables\Actions\DeleteBulkAction::make(),
-
             ]);
     }
 

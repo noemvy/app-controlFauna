@@ -127,63 +127,18 @@ class IntervencionesEventoDraftResource extends Resource
                 ->required(),
             //Select para escoger la cantidad de fauna vista.
             Forms\Components\Select::make('vistos')
-            ->options(['0' => '0 (0)',
-                        '1(1)' => '1 (1)',
-                        '2(2)' => '2 (2)',
-                        '3(3)' => '3 (3)',
-                        '4(4)' => '4 (4)',
-                        '5(5)' => '5 (5)',
-                        '6(6)' => '6 (6)',
-                        '7(7)' => '7 (7)',
-                        '8(8)' => '8 (8)',
-                        '9(9)' => '9 (9)',
-                        '10(10)' => '10 (10)',
-                        '15(11-20)' => '15 (11–20)',
-                        '25(21-30)' => '25 (21–30)',
-                        '35(31-40)' => '35 (31–40)',
-                        '45(41-50)' => '45 (41–50)',
-                        '63(51-75)' => '63 (51–75)',])
+            ->options(self::getCantidadOptions())
             ->label('Vistos')
             ->placeholder('Seleccione una cantidad'),
             //Select para escoger la cantidad de fauna sacrificada , si es el caso
             Forms\Components\Select::make('sacrificados')
             ->label('Sacrificados')
-            ->options(['0' => '0 (0)',
-                        '1(1)' => '1 (1)',
-                        '2(2)' => '2 (2)',
-                        '3(3)' => '3 (3)',
-                        '4(4)' => '4 (4)',
-                        '5(5)' => '5 (5)',
-                        '6(6)' => '6 (6)',
-                        '7(7)' => '7 (7)',
-                        '8(8)' => '8 (8)',
-                        '9(9)' => '9 (9)',
-                        '10(10)' => '10 (10)',
-                        '15(11-20)' => '15 (11–20)',
-                        '25(21-30)' => '25 (21–30)',
-                        '35(31-40)' => '35 (31–40)',
-                        '45(41-50)' => '45 (41–50)',
-                        '63(51-75)' => '63 (51–75)',])
+            ->options(self::getCantidadOptions())
             ->placeholder('Seleccione una cantidad'),
             //Select para escoger cantidad de fauna dispersada
             Forms\Components\Select::make('dispersados')
             ->label('Dispersados')
-            ->options(['0' => '0 (0)',
-                        '1(1)' => '1 (1)',
-                        '2(2)' => '2 (2)',
-                        '3(3)' => '3 (3)',
-                        '4(4)' => '4 (4)',
-                        '5(5)' => '5 (5)',
-                        '6(6)' => '6 (6)',
-                        '7(7)' => '7 (7)',
-                        '8(8)' => '8 (8)',
-                        '9(9)' => '9 (9)',
-                        '10(10)' => '10 (10)',
-                        '15(11-20)' => '15 (11–20)',
-                        '25(21-30)' => '25 (21–30)',
-                        '35(31-40)' => '35 (31–40)',
-                        '45(41-50)' => '45 (41–50)',
-                        '63(51-75)' => '63 (51–75)',])
+            ->options(self::getCantidadOptions())
             ->placeholder('Seleccione una cantidad'),
             //Insertar imagen
             Forms\Components\FileUpload::make('fotos')
@@ -238,6 +193,7 @@ class IntervencionesEventoDraftResource extends Resource
             ->minItems(1)
             ->defaultItems(1)
             ->reorderable()
+            ->columnSpanFull()
             ->collapsible(),
             ]);
 
@@ -260,8 +216,13 @@ class IntervencionesEventoDraftResource extends Resource
                     'TWR' => 'TWR',
                     'SSEI'=>'SSEI',
                     'AVSEC'=>'AVSEC',
+                ]),
+                Tables\Filters\SelectFilter::make('tipo_evento')->label('Tipo Evento')
+                ->options([
+                    'Dispersión'=>'Dispersión',
+                    'Recogida' => 'Recogida',
                 ])
-            ])
+            ])->searchable()
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 //Ventanita para las actualizaciones.
@@ -294,12 +255,7 @@ class IntervencionesEventoDraftResource extends Resource
                 ->color('danger')
                 ->url(fn($record) => route('eventoIntervenciones.pdf', $record->id))
                 // ->openUrlInNewTab(), // Esto hace que el PDF se abra en una nueva pestaña
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+        ]);
     }
 
     public static function getRelations(): array
@@ -328,4 +284,25 @@ protected static function getWeatherData(string $city = 'Panama,PA')
         return $response->successful() ? $response->json() : null;
     });
 }
+protected static function getCantidadOptions(): array
+    {
+        return [
+            '0' => '0 (0)',
+            '1' => '1 (1)',
+            '2' => '2 (2)',
+            '3' => '3 (3)',
+            '4' => '4 (4)',
+            '5' => '5 (5)',
+            '6' => '6 (6)',
+            '7' => '7 (7)',
+            '8' => '8 (8)',
+            '9' => '9 (9)',
+            '10' => '10 (10)',
+            '15' => '15 (11–20)',
+            '25' => '25 (21–30)',
+            '35' => '35 (31–40)',
+            '45' => '45 (41–50)',
+            '63' => '63 (51–75)',
+        ];
+    }
 }

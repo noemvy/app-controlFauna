@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Storage;
+use Filament\Actions\Action;
 
 class ListIntervencionesEventoDrafts extends ListRecords
 {
@@ -22,110 +23,198 @@ class ListIntervencionesEventoDrafts extends ListRecords
             /*----------------------------BOTON DE NUEVA INTERVENCION--------------------------------*/
             Actions\CreateAction::make('Nueva intervención')
                 ->label('Nueva Interveción'),
-            // Botón para descargar excel.
-            Actions\action::make('exportReports')
-                ->label('Descargar Reportes')
-                ->icon('heroicon-o-arrow-down-on-square')
-                ->color('warning')
+            Action::make('exportReports')
+                ->label('Reportes en Excel')
+                ->icon('lucide-file-x-2')
+                ->color('info')
                 ->action(function () {
                     $spreadsheet = new Spreadsheet();
                     $sheet = $spreadsheet->getActiveSheet();
-                    // Agregar encabezados
-                    $headers = [
-                        'Codigo',
-                        'Usuario',
-                        'Tipo de Evento',
-                        'Origen del Reporte',
-                        'Coordenada X',
-                        'Coordenada Y',
-                        'Temperatura',
-                        'Viento',
-                        'Humedad',
-                        'Grupo',
-                        'Especie',
-                        'Atractivo',
-                        'Vistos',
-                        'Dispersados',
-                        'Sacrificados',
-                        'Herramienta Utilizada',
-                        'Tipo de Acción Realizada',
-                        'Cantidad utilizada',
-                        'Comentarios',
-                        'Fecha creación',
-                    ];
-                    $sheet->fromArray([$headers], null, 'A1');
+        // Encabezados
+        $headers = [
+            'Codigo',
+            'Usuario',
+            'Tipo de Evento',
+            'Origen del Reporte',
+            'Coordenada X',
+            'Coordenada Y',
+            'Temperatura',
+            'Viento',
+            'Humedad',
+            'Grupo',
+            'Especie',
+            'Atractivo',
+            'Vistos',
+            'Dispersados',
+            'Sacrificados',
+            'Herramienta Utilizada',
+            'Tipo de Acción Realizada',
+            'Cantidad utilizada',
+            'Comentarios',
+            'Fecha creación',
+            // Encabezados para actualizaciones
+            'Fecha Actualización',
+            'Autor Actualización',
+            'Contenido Actualización',
+        ];
+        $sheet->fromArray([$headers], null, 'A1');
 
-                    // Agregar datos desde la base de datos
-                    $reportes = IntervencionesEventoDraft::all();
-                    $row = 2;
-                    foreach ($reportes as $reporte) {
-    if (!empty($reporte->municion_utilizada)) {
-        foreach ($reporte->municion_utilizada as $municion) {
-            $catalogo = CatalogoInventario::with('acciones')->find($municion['catinventario_id']);
-            if ($catalogo) {
-                $sheet->fromArray([
-                    $reporte->id,
-                    $reporte->user_id,
-                    $reporte->tipo_evento,
-                    $reporte->origen,
-                    $reporte->coordenada_x,
-                    $reporte->coordenada_y,
-                    $reporte->temperatura,
-                    $reporte->viento,
-                    $reporte->humedad,
-                    $reporte->especies->grupo->nombre ?? '',
-                    $reporte->especies_id,
-                    $reporte->atractivo->nombre ?? '',
-                    $reporte->visto,
-                    $reporte->dispersados,
-                    $reporte->sacrificados,
-                    $catalogo->nombre,
-                    $catalogo->acciones->nombre ?? 'Sin acción',
-                    $municion['cantidad_utilizada'],
-                    $reporte->comentarios,
-                    !empty($reporte->created_at) ? Carbon::parse($reporte->created_at)->format('Y-m-d h:i A') : '',
-                ], null, "A$row");
-                $row++;
+        // Obtener todos los reportes con relaciones necesarias
+        $reportes = IntervencionesEventoDraft::with([
+            'user',
+            'especie.grupo',
+            'atractivo',
+            'pivoteEvento.catalogoInventario.acciones',
+            'actualizacionesEvento.user' // Relación para traer usuario de actualizaciones
+        ])->get();
+
+        $row = 2;
+
+        foreach ($reportes as $reporte) {
+            // Si tiene municiones en pivoteEvento, recorremos cada una
+            if ($reporte->pivoteEvento->isNotEmpty()) {
+                foreach ($reporte->pivoteEvento as $pivote) {
+                    $catalogo = $pivote->catalogoInventario;
+                    $accion = $catalogo->acciones ?? null;
+
+                    // Si hay actualizaciones, hacer una fila por cada actualización
+                    if ($reporte->actualizacionesEvento->isNotEmpty()) {
+                        foreach ($reporte->actualizacionesEvento as $actualizacion) {
+                            $sheet->fromArray([
+                                $reporte->id,
+                                $reporte->user->name ?? 'N/A',
+                                $reporte->tipo_evento,
+                                $reporte->origen,
+                                $reporte->coordenada_x,
+                                $reporte->coordenada_y,
+                                $reporte->temperatura,
+                                $reporte->viento,
+                                $reporte->humedad,
+                                $reporte->especies->grupo->nombre ?? '',
+                                $reporte->especies->nombre ?? '',
+                                $reporte->atractivo->nombre ?? '',
+                                $reporte->visto,
+                                $reporte->dispersados,
+                                $reporte->sacrificados,
+                                $catalogo->nombre ?? '',
+                                $accion->nombre ?? 'Sin acción',
+                                $pivote->cantidad_utilizada ?? '',
+                                $reporte->comentarios,
+                                $reporte->created_at ? Carbon::parse($reporte->created_at)->format('Y-m-d h:i A') : '',
+                                // Datos de la actualización
+                                $actualizacion->created_at ? Carbon::parse($actualizacion->created_at)->format('Y-m-d h:i A') : '',
+                                $actualizacion->user->name ?? 'N/A',
+                                $actualizacion->actualizacion ?? '',
+                            ], null, "A$row");
+
+                            $row++;
+                        }
+                    } else {
+                        // Sin actualizaciones: fila normal con munición
+                        $sheet->fromArray([
+                            $reporte->id,
+                            $reporte->user->name ?? 'N/A',
+                            $reporte->tipo_evento,
+                            $reporte->origen,
+                            $reporte->coordenada_x,
+                            $reporte->coordenada_y,
+                            $reporte->temperatura,
+                            $reporte->viento,
+                            $reporte->humedad,
+                            $reporte->especies->grupo->nombre ?? '',
+                            $reporte->especies->nombre ?? '',
+                            $reporte->atractivo->nombre ?? '',
+                            $reporte->visto,
+                            $reporte->dispersados,
+                            $reporte->sacrificados,
+                            $catalogo->nombre ?? '',
+                            $accion->nombre ?? 'Sin acción',
+                            $pivote->cantidad_utilizada ?? '',
+                            $reporte->comentarios,
+                            $reporte->created_at ? Carbon::parse($reporte->created_at)->format('Y-m-d h:i A') : '',
+                            '', // Fecha actualización
+                            '', // Autor actualización
+                            '', // Contenido actualización
+                        ], null, "A$row");
+
+                        $row++;
+                    }
+                }
+            } else {
+                // Reporte sin municiones en pivoteEvento
+
+                // Si tiene actualizaciones, una fila por cada actualización
+                if ($reporte->actualizacionesEvento->isNotEmpty()) {
+                    foreach ($reporte->actualizacionesEvento as $actualizacion) {
+                        $sheet->fromArray([
+                            $reporte->id,
+                            $reporte->user->name ?? 'N/A',
+                            $reporte->tipo_evento,
+                            $reporte->origen,
+                            $reporte->coordenada_x,
+                            $reporte->coordenada_y,
+                            $reporte->temperatura,
+                            $reporte->viento,
+                            $reporte->humedad,
+                            $reporte->especies->grupo->nombre ?? '',
+                            $reporte->especies->nombre ?? '',
+                            $reporte->atractivo->nombre ?? '',
+                            $reporte->visto,
+                            $reporte->dispersados,
+                            $reporte->sacrificados,
+                            '', // Herramienta
+                            '', // Acción
+                            '', // Cantidad
+                            $reporte->comentarios,
+                            $reporte->created_at ? Carbon::parse($reporte->created_at)->format('Y-m-d h:i A') : '',
+                            // Actualización
+                            $actualizacion->created_at ? Carbon::parse($actualizacion->created_at)->format('Y-m-d h:i A') : '',
+                            $actualizacion->user->name ?? 'N/A',
+                            $actualizacion->actualizacion ?? '',
+                        ], null, "A$row");
+
+                        $row++;
+                    }
+                } else {
+                    // Sin munición ni actualizaciones, solo una fila con datos reporte
+                    $sheet->fromArray([
+                        $reporte->id,
+                        $reporte->user->name ?? 'N/A',
+                        $reporte->tipo_evento,
+                        $reporte->origen,
+                        $reporte->coordenada_x,
+                        $reporte->coordenada_y,
+                        $reporte->temperatura,
+                        $reporte->viento,
+                        $reporte->humedad,
+                        $reporte->especies->grupo->nombre ?? '',
+                        $reporte->especies->nombre ?? '',
+                        $reporte->atractivo->nombre ?? '',
+                        $reporte->visto,
+                        $reporte->dispersados,
+                        $reporte->sacrificados,
+                        '', // Herramienta
+                        '', // Acción
+                        '', // Cantidad
+                        $reporte->comentarios,
+                        $reporte->created_at ? Carbon::parse($reporte->created_at)->format('Y-m-d h:i A') : '',
+                        '', '', '', // Sin actualizaciones
+                    ], null, "A$row");
+
+                    $row++;
+                }
             }
         }
-    } else {
-        // Si no hay munición utilizada, registrar el resto de los datos sin herramienta
-        $sheet->fromArray([
-            $reporte->id,
-            $reporte->user_id,
-            $reporte->tipo_evento,
-            $reporte->origen,
-            $reporte->coordenada_x,
-            $reporte->coordenada_y,
-            $reporte->temperatura,
-            $reporte->viento,
-            $reporte->humedad,
-            $reporte->especies->grupo->nombre ?? '',
-            $reporte->especies_id,
-            $reporte->atractivo->nombre ?? '',
-            $reporte->visto,
-            $reporte->dispersados,
-            $reporte->sacrificados,
-            '', // Herramienta
-            '', // Acción
-            '', // Cantidad
-            $reporte->comentarios,
-            !empty($reporte->created_at) ? Carbon::parse($reporte->created_at)->format('Y-m-d h:i A') : '',
-        ], null, "A$row");
-        $row++;
-    }
-}
 
+        $fileName = 'Reporte_Evento_Intervenciones.xlsx';
+        $tempFilePath = storage_path("app/public/{$fileName}"); // ruta para guardar temporalmente
 
-                    // Guardar archivo temporalmente
-                    $fileName = 'Reporte Evento Intervenciones.xlsx';
-                    $tempFilePath = Storage::path($fileName);
-                    $writer = new Xlsx($spreadsheet);
-                    $writer->save($tempFilePath);
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($tempFilePath);
 
-                    // Devolver archivo como respuesta de descarga
-                    return response()->download($tempFilePath, $fileName)->deleteFileAfterSend(true);
-                }),
+        return response()->download($tempFilePath, $fileName)->deleteFileAfterSend(true);
+    }),
+
         ];
     }
 

@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use app\Filament\Resources\MovimientoInventarioRelationManagerResource;
 use Filament\Tables\Filters\SelectFilter;
-
+use Carbon\Carbon;
 
 
 class InventarioMunicionesResource extends Resource
@@ -36,25 +36,38 @@ class InventarioMunicionesResource extends Resource
     {
         return $form
             ->schema([
-            Forms\Components\Select::make('catinventario_id')
-                ->label('Equipo')
-                ->placeholder('Eliga el equipo')
-                ->options(CatalogoInventario::all()->pluck('nombre','id'))
-                    ->required()
-                    ->searchable()
-                    ->preload(),
             Forms\Components\Select::make('aerodromo_id')
                 ->label('Aeropuerto')
                 ->placeholder('Eliga el Aeropuerto al que pertenece')
                 ->options(Aerodromo::all()->pluck('nombre','id'))
-                    ->required()
-                    ->searchable()
-                    ->preload(),
-            Forms\Components\TextInput::make('cantidad_minima')
-                ->label('Cantidad Minima')
                 ->required()
+                ->searchable()
+                ->preload()
+                ->reactive(),
+                Forms\Components\Select::make('catinventario_id')
+                ->label('Equipo')
+                ->placeholder('Elija el equipo')->required()
+                ->searchable()->preload()->reactive()
+                ->options(function (callable $get, $record) {
+                $aerodromoId = $get('aerodromo_id');
+                $query = CatalogoInventario::query();
+                if ($aerodromoId) {
+                    $yaRegistrados = InventarioMuniciones::where('aerodromo_id', $aerodromoId)
+                        ->pluck('catinventario_id');
+                    $query->whereNotIn('id', $yaRegistrados);
+                    // Asegura que el equipo actual (en edición) sí se incluya
+                    if ($record && $record->catinventario_id) {
+                        $query->orWhere('id', $record->catinventario_id);
+                    }
+                }
+                return $query->pluck('nombre', 'id');
+            }),
+            Forms\Components\TextInput::make('cantidad_minima')
+                ->label('Cantidad Mínima')
+                ->required()
+                ->numeric()
                 ->maxLength(20),
-                        ]);
+        ]);
     }
 
     public static function table(Table $table): Table
@@ -69,41 +82,39 @@ class InventarioMunicionesResource extends Resource
                 return $state . ' unidades';
             })
             ->color(function ($state, $record) {
-            $minima = $record->cantidad_minima;
-            $mitad = $minima / 2;
-            $faltan = $minima - $state;
-
-            if ($state >= $minima) {
-                return 'success'; // Verde
-            } elseif ($state > $mitad && $faltan > 20) {
-                return 'warning'; // Amarillo
-            }
-
-            return 'danger'; // Rojo
-        }),
+                $minima = $record->cantidad_minima;
+                if ($state >= $minima) {
+                    return 'success';
+                }
+                return 'warning';
+            }),
             Tables\Columns\TextColumn::make('cantidad_minima')->label('Cantidad Minima'),
-
-            Tables\Columns\TextColumn::make('movimientos_count')->label('Número de Movimientos')
+            Tables\Columns\TextColumn::make('movimientos_count')->label('Movimientos')
                 ->getStateUsing(function ($record) {
                     return $record->movimientos->count();
                 }),
-                ])
+            Tables\Columns\TextColumn::make('created_at')->label('Creado')
+            ->formatStateUsing(fn ($state) => Carbon::parse($state)->timezone('America/Panama'))
+            ->dateTime('d/m/Y')
+            ->sortable(),
+            ])->defaultSort('created_at', 'desc')
+            ->searchable()
+            /*-------------------------------------FILTROS-------------------------------------------------------------*/
             ->filters([
                 SelectFilter::make('aerodromo.id')
                 ->label('Filtrar por Aeropuerto')
                 ->relationship('aerodromo', 'nombre')
                 ->placeholder('Selecciona un Aeropuerto'),
+                SelectFilter::make('catalogoInventario.nombre')
+                ->label('Filtrar por Equipo')
+                ->relationship('catalogoInventario','nombre')
+                ->placeholder('Seleccione un Equipo')
 
             ])
             ->actions([
 
                 Tables\Actions\EditAction::make()->label('Crear Movimientos'),
 
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
             ]);
     }
 

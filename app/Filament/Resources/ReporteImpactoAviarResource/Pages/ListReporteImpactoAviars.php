@@ -63,6 +63,10 @@ class ListReporteImpactoAviars extends ListRecords
                         'Cargo',
                         'Correo Electrónico',
                         'Creado el',
+                          // Encabezados para actualizaciones
+                        'Fecha Actualización',
+                        'Autor Actualización',
+                        'Contenido Actualización',
                     ];
                     $sheet->fromArray([$headers], null, 'A1');
 
@@ -108,7 +112,7 @@ class ListReporteImpactoAviars extends ListRecords
                             $reporte->costo_reparacion ?? '',
                             $reporte->costo_otros ?? '',
                             $reporte->estado ?? '',
-                            $reporte->Autor ?? '',
+                            $reporte->user->name ?? '',
                             $reporte->cargo ?? '',
                             $reporte->email ?? '',
                             !empty($reporte->created_at) ? Carbon::parse($reporte->created_at)->format('Y-m-d h:i: A') : '',

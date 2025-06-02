@@ -7,6 +7,7 @@ use Filament\Resources\Pages\CreateRecord;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
 use App\Models\InventarioMuniciones;
+use App\Models\PivotePatrullajeIntervencion;
 
 class CreateIntervencionesDraft extends CreateRecord
 {
@@ -15,15 +16,6 @@ class CreateIntervencionesDraft extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['user_id'] = Filament::auth()->id();
-
-        $repeaterData = $data['municion_utilizada'][0] ?? null;
-
-        if ($repeaterData) {
-            $data['catinventario_id'] = $repeaterData['catinventario_id'];
-            $data['acciones_id'] = $repeaterData['acciones_id'];
-            $data['cantidad_utilizada'] = $repeaterData['cantidad_utilizada'] ?? null;
-        }
-
         return $data;
     }
 
@@ -33,13 +25,11 @@ class CreateIntervencionesDraft extends CreateRecord
         $usuario = Filament::auth()->user();
         $aerodromoId = $usuario->aerodromo_id;
 
-        foreach ($data['municion_utilizada'] as $item) {
+        $municiones = $data['municion_utilizada'] ?? [];
+
+        foreach ($municiones as $item) {
             $catId = $item['catinventario_id'] ?? null;
             $cantidad = (int) ($item['cantidad_utilizada'] ?? 0);
-
-            if (!$catId || $cantidad <= 0) {
-                continue;
-            }
 
             $inventario = InventarioMuniciones::where('catinventario_id', $catId)
                 ->where('aerodromo_id', $aerodromoId)
@@ -47,10 +37,9 @@ class CreateIntervencionesDraft extends CreateRecord
 
             if (!$inventario) {
                 Notification::make()
-                    ->title("No hay inventario registrado para la herramienta seleccionada.")
+                    ->title("No existe inventario registrado para esta herramienta.")
                     ->danger()
                     ->send();
-
                 $this->halt();
                 return;
             }
@@ -60,7 +49,6 @@ class CreateIntervencionesDraft extends CreateRecord
                     ->title("Stock insuficiente de '{$inventario->catalogoInventario->nombre}'. Solo hay {$inventario->cantidad_actual}.")
                     ->danger()
                     ->send();
-
                 $this->halt();
                 return;
             }
@@ -72,29 +60,39 @@ class CreateIntervencionesDraft extends CreateRecord
         $intervencion = $this->record;
         $usuario = Filament::auth()->user();
         $aerodromoId = $usuario->aerodromo_id;
+        $municiones = $this->form->getState()['municion_utilizada'] ?? [];
 
-        foreach ($intervencion->municion_utilizada as $item) {
+        foreach ($municiones as $item) {
             $catId = $item['catinventario_id'];
+            $accionId = $item['acciones_id'];
             $cantidad = (int) $item['cantidad_utilizada'];
 
+            // Descontar del inventario
             $inventario = InventarioMuniciones::where('catinventario_id', $catId)
                 ->where('aerodromo_id', $aerodromoId)
                 ->first();
 
-            // Ya no es necesario validar aquí porque ya lo hicimos antes
             if ($inventario) {
                 $inventario->cantidad_actual -= $cantidad;
                 $inventario->save();
             }
+
+            // Guardar en tabla pivote
+            PivotePatrullajeIntervencion::create([
+                'intervencion_draft_id' => $intervencion->id,
+                'catinventario_id' => $catId,
+                'acciones_id' => $accionId,
+                'cantidad_utilizada' => $cantidad,
+            ]);
         }
 
         Notification::make()
-            ->title("Intervención registrada y stock actualizado correctamente.")
+            ->title("Intervención registrada correctamente. Stock actualizado.")
             ->success()
             ->send();
     }
 
-    function getRedirectUrl(): string
+    protected function getRedirectUrl(): string
     {
         return route('filament.dashboard.resources.patrullajes.create');
     }
