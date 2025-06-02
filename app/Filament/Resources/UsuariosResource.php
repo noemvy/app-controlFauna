@@ -22,7 +22,8 @@ class UsuariosResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-user';
     protected static ?string $navigationGroup = 'Usuarios';
-
+    protected static ?string $modelLabel = 'Usuarios';
+    protected static ?int $navigationSort = 999; 
     public static function form(Form $form): Form
     {
         return $form
@@ -63,7 +64,7 @@ class UsuariosResource extends Resource
             Tables\Columns\TextColumn::make('estado')->label('Activo'),
             Tables\Columns\TextColumn::make('aerodromo.nombre')->label('Aeródromo')->sortable(),
             Tables\Columns\TextColumn::make('departamento.nombre')->label('Departamento')->sortable(),
-            ])
+            ])->defaultSort('created_at', 'desc')
             ->filters([
                 //
             ])
