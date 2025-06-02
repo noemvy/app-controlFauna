@@ -25,7 +25,7 @@ class ListReporteImpactoAviars extends ListRecords
             ->label('Nuevo Reporte'),
             //Botón para descargar excel.
             Actions\Action::make('exportReports')
-            ->label('Descargar Reportes')
+            ->label('Descargar Excel')
             ->icon('lucide-file-x-2')
             ->color('info')
             ->form([
@@ -114,6 +114,15 @@ class ListReporteImpactoAviars extends ListRecords
         }
 
         $reportes = $query->get();
+        if ($reportes->isEmpty()) {
+        \Filament\Notifications\Notification::make()
+            ->title('Sin resultados')
+            ->body('No hay datos disponibles para descargar')
+            ->warning()
+            ->send();
+
+        return;
+    }
         $row = 2;
 
         foreach ($reportes as $reporte) {
