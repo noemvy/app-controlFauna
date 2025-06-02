@@ -49,11 +49,12 @@ class CatalogoInventarioResource extends Resource
                         'Instrumento' => 'Instrumento',
                     ])
                     ->required(),
-                Forms\Components\Select::make('tipo')
+                
+                Forms\Components\Select::make('es_consumible')
                     ->label('Tipo de Equipo')
                     ->options([
-                        'Consumible' => 'Consumible',
-                        'No Consumible' => 'No Consumible',
+                        1 => 'Consumible',
+                        0 => 'No Consumible',
                     ])
                     ->required(),
                 Forms\Components\TextInput::make('descripcion')
@@ -77,6 +78,14 @@ class CatalogoInventarioResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')->label('Nombre')
                 ->searchable(),
+                Tables\Columns\IconColumn::make('es_consumible')->label('Tipo')
+                ->boolean()
+                    ->trueIcon('heroicon-o-check-circle') // Ícono para verdadero
+                    ->falseIcon('heroicon-o-x-circle') // Ícono para falso
+                    ->trueColor('success') // Color para verdadero
+                    ->falseColor('danger')// Color para falso
+                ->searchable(),
+
                 Tables\Columns\IconColumn::make('estado')
                     ->label('Activo')
                     ->boolean()
