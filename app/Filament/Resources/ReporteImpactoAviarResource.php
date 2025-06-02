@@ -94,12 +94,18 @@ class ReporteImpactoAviarResource extends Resource
                 //Altitud
                 Forms\Components\TextInput::make('Altitud')
                     ->label('Altitud en Metros')
-                    ->numeric()
+                    ->type('number')
+                    ->extraAttributes([
+                        'onkeydown' => "if(['e','E','+','-'].includes(event.key)){event.preventDefault();}",
+                    ])
                     ->required(),
                 //Velocidad
                 Forms\Components\TextInput::make('Velocidad')
                     ->label('Velocidad a la que impactó m/s')
-                    ->numeric(),
+                    ->type('number')
+                    ->extraAttributes([
+                        'onkeydown' => "if(['e','E','+','-'].includes(event.key)){event.preventDefault();}",
+                    ])
                 ])->columns(3),
 /*-----------------------------------------------Condiciones Atmosféricas y de Vuelo---------------------------------------------------------------*/
                 Forms\Components\Section::make('Condiciones Atmosféricas y de Vuelo')
@@ -135,10 +141,15 @@ class ReporteImpactoAviarResource extends Resource
                     ]),
                     Forms\Components\TextInput::make('temperatura')
                     ->label('temperatura °C')
-                    ->numeric(),
+                    ->type('number')
+                    ->extraAttributes([
+                        'onkeydown' => "if(['e','E','+','-'].includes(event.key)){event.preventDefault();}",
+                    ]),
                     Forms\Components\TextInput::make('viento_velocidad')
-                    ->label('Velocidad del viento m/s')
-                    ->numeric(),
+                    ->type('number')
+                    ->extraAttributes([
+                        'onkeydown' => "if(['e','E','+','-'].includes(event.key)){event.preventDefault();}",
+                    ]),
                     Forms\Components\Select::make('viento_direccion')
                     ->label('Dirección del viento')
                     ->options([
@@ -188,40 +199,10 @@ class ReporteImpactoAviarResource extends Resource
                 ->preload(),
                 Forms\Components\Select::make('fauna_impactada')
                     ->label('Cantidad de Fauna Impactada')
-                    ->options(['0' => '0 (0)',
-                        '1' => '1 (1)',
-                        '2' => '2 (2)',
-                        '3' => '3 (3)',
-                        '4' => '4 (4)',
-                        '5' => '5 (5)',
-                        '6' => '6 (6)',
-                        '7' => '7 (7)',
-                        '8' => '8 (8)',
-                        '9' => '9 (9)',
-                        '10' => '10 (10)',
-                        '15' => '15 (11–20)',
-                        '25' => '25 (21–30)',
-                        '35' => '35 (31–40)',
-                        '45' => '45 (41–50)',
-                        '63' => '63 (51–75)',]),
+                    ->options(self::getCantidadOptions()),
                 Forms\Components\Select::make('fauna_observada')
                     ->label('Fauna Observada')
-                    ->options(['0' => '0 (0)',
-                        '1' => '1 (1)',
-                        '2' => '2 (2)',
-                        '3' => '3 (3)',
-                        '4' => '4 (4)',
-                        '5' => '5 (5)',
-                        '6' => '6 (6)',
-                        '7' => '7 (7)',
-                        '8' => '8 (8)',
-                        '9' => '9 (9)',
-                        '10' => '10 (10)',
-                        '15' => '15 (11–20)',
-                        '25' => '25 (21–30)',
-                        '35' => '35 (31–40)',
-                        '45' => '45 (41–50)',
-                        '63' => '63 (51–75)',]),
+                    ->options(self::getCantidadOptions()),
                 Forms\Components\Select::make('fauna_tamano')
                     ->label('Tamaño de las Especies')
                     ->options([
@@ -299,13 +280,22 @@ class ReporteImpactoAviarResource extends Resource
                 ->required(),
                 Forms\Components\TextInput::make('tiempo_fs')
                 ->label('Tiempo de la aeronave fuera de servicio (Horas)')
-                ->numeric(),
+                ->type('number')
+                ->extraAttributes([
+                        'onkeydown' => "if(['e','E','+','-'].includes(event.key)){event.preventDefault();}",
+                    ]),
                 Forms\Components\TextInput::make('costo_reparacion')
                 ->label('Costo estimado en reparaciones o reemplazo de piezas (Dólares o Balboas)')
-                ->numeric(),
+                ->type('number')
+                ->extraAttributes([
+                        'onkeydown' => "if(['e','E','+','-'].includes(event.key)){event.preventDefault();}",
+                    ]),
                 Forms\Components\TextInput::make('costo_otros')
                 ->label('otros costo estimados. Ejemp: combustible, hoteles, etc. (Dólares o Balboas)')
-                ->numeric(),
+                ->type('number')
+                ->extraAttributes([
+                        'onkeydown' => "if(['e','E','+','-'].includes(event.key)){event.preventDefault();}",
+                    ]),
                 ])->columns(2),
                 /*--------------------------------------SECCION COMENTARIOS--------------------------------------------*/
                 Forms\Components\Section::make('Comentarios')
@@ -365,7 +355,7 @@ class ReporteImpactoAviarResource extends Resource
             ->action(function ($record, array $data): void {
                 $record->actualizaciones()->create([
                     'actualizacion' => $data['actualizacion'],
-                    'autor' => Filament::auth()->id()
+                    'autor' => Filament::auth()->id(),
                 ]);
             }),
             /*---------------------------Reporte en pdf-------------------------------------------------*/
@@ -390,6 +380,28 @@ class ReporteImpactoAviarResource extends Resource
             'index' => Pages\ListReporteImpactoAviars::route('/'),
             'create' => Pages\CreateReporteImpactoAviar::route('/create'),
             'edit' => Pages\EditReporteImpactoAviar::route('/{record}/edit'),
+        ];
+    }
+
+    protected static function getCantidadOptions(): array
+    {
+        return [
+            '0' => '0 (0)',
+            '1' => '1 (1)',
+            '2' => '2 (2)',
+            '3' => '3 (3)',
+            '4' => '4 (4)',
+            '5' => '5 (5)',
+            '6' => '6 (6)',
+            '7' => '7 (7)',
+            '8' => '8 (8)',
+            '9' => '9 (9)',
+            '10' => '10 (10)',
+            '15' => '15 (11–20)',
+            '25' => '25 (21–30)',
+            '35' => '35 (31–40)',
+            '45' => '45 (41–50)',
+            '63' => '63 (51–75)',
         ];
     }
 }
