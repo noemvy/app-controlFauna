@@ -60,8 +60,6 @@ class ListReporteImpactoAviars extends ListRecords
                         'Otros costos',
                         'Estado del reporte',
                         'Autor',
-                        'Cargo',
-                        'Correo Electrónico',
                         'Creado el',
                           // Encabezados para actualizaciones
                         'Fecha Actualización',
@@ -70,16 +68,27 @@ class ListReporteImpactoAviars extends ListRecords
                     ];
                     $sheet->fromArray([$headers], null, 'A1');
 
-                    // Agregar datos desde la base de datos
-                    $reportes = ReporteImpactoAviar::all();
+                     // Obtener el reporte con relaciones necesarias
+                        $reportes = ReporteImpactoAviar::with([
+                            'aerodromo',
+                            'pista',
+                            'aerolinea',
+                            'modelo',
+                            'especie',
+                            'partesGolpeadas',
+                            'partesDanadas',
+                            'user',
+                            'actualizaciones',
+                        ])->get();
                     $row = 2;
+
                     foreach ($reportes as $reporte) {
                         // Obtener los nombres de las piezas golpeadas
                         $partesGolpeadas = $reporte->partesGolpeadas->pluck('nombre')->implode(', ') ?: 'N/A';
-
                         // Obtener los nombres de las piezas dañadas
                         $partesDanadas = $reporte->partesDanadas->pluck('nombre')->implode(', ') ?: 'N/A';
-
+                        if ($reporte->actualizaciones->isNotEmpty()) {
+                        foreach ($reporte->actualizaciones as $actualizacion) {
                         $sheet->fromArray([
                             $reporte->codigo,
                             $reporte->aerodromo->codigo ?? '',
@@ -113,13 +122,58 @@ class ListReporteImpactoAviars extends ListRecords
                             $reporte->costo_otros ?? '',
                             $reporte->estado ?? '',
                             $reporte->user->name ?? '',
-                            $reporte->cargo ?? '',
-                            $reporte->email ?? '',
+                            $reporte->created_at ? Carbon::parse($reporte->created_at)->format('Y-m-d h:i A') : '',
+                            // Datos de la actualización
+                            $actualizacion->created_at ? Carbon::parse($actualizacion->created_at)->format('Y-m-d h:i A') : '',
+                            $actualizacion->user->name ?? 'N/A',
+                            $actualizacion->actualizacion ?? '',
                             !empty($reporte->created_at) ? Carbon::parse($reporte->created_at)->format('Y-m-d h:i: A') : '',
                         ], null, "A$row");
                         $row++;
                     }
-
+                }else{
+                $sheet->fromArray([
+                            $reporte->codigo,
+                            $reporte->aerodromo->codigo ?? '',
+                            $reporte->pista->nombre ?? '',
+                            !empty($reporte->fecha) ? Carbon::parse($reporte->fecha)->format('Y-m-d h:i: A') : '',
+                            $reporte->aerolinea->nombre ?? '',
+                            $reporte->modelo->modelo ?? '',
+                            $reporte->matricula ?? '',
+                            $reporte->advertido_transito === null
+                                ? 'No especificado'
+                                : ($reporte->advertido_transito == 1 ? 'Sí' : 'No'),
+                            $reporte->Altitud ?? '',
+                            $reporte->Velocidad ?? '',
+                            $reporte->Luminosidad ?? '',
+                            $reporte->Fase_vuelo ?? '',
+                            $reporte->cielo ?? '',
+                            $reporte->temperatura ?? '',
+                            $reporte->viento_velocidad ?? '',
+                            $reporte->viento_direccion ?? '',
+                            $reporte->condicion_visual ?? '',
+                            $reporte->fauna->nombre ?? '',
+                            $reporte->fauna_observada ?? '',
+                            $reporte->fauna_impactada ?? '',
+                            $reporte->fauna_tamano ?? '',
+                            $partesGolpeadas,
+                            $partesDanadas,
+                            $reporte->consecuencia ?? '',
+                            $reporte->observacion ?? '',
+                            $reporte->tiempo_fs ?? '',
+                            $reporte->costo_reparacion ?? '',
+                            $reporte->costo_otros ?? '',
+                            $reporte->estado ?? '',
+                            $reporte->user->name ?? '',
+                            $reporte->created_at ? Carbon::parse($reporte->created_at)->timezone('America/Panama')->format('Y-m-d h:i A') : '',
+                            !empty($reporte->created_at) ? Carbon::parse($reporte->created_at)->timezone('America/Panama')->format('Y-m-d h:i: A') : '',
+                            '', // Fecha actualización
+                            '', // Autor actualización
+                            '', // Contenido actualización
+                        ], null, "A$row");
+                        $row++;
+            }
+        }
                     // Guardar archivo temporalmente
                     $fileName = 'reportes de Impacto con Fauna.xlsx';
                     $tempFilePath = Storage::path($fileName);
