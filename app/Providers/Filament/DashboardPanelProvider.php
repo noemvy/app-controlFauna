@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use App\Filament\Resources\PatrullajeResource\Widgets\PatrullajeStats;
 use App\Filament\Widgets\EstadisticaEspeciesChart;
+use App\Filament\Widgets\MunicionesChart;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -42,8 +43,9 @@ class DashboardPanelProvider extends PanelProvider
                     'warning' => Color::Amber,
             ])
             ->widgets([
-                PatrullajeStats::class
-                // EstadisticaEspeciesChart::class,
+                PatrullajeStats::class,
+                EstadisticaEspeciesChart::class,
+                MunicionesChart::class,
             ])
             ->darkMode(false)
             ->renderHook('panels::body.start', fn()=>'
