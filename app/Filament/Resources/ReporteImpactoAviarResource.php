@@ -16,6 +16,7 @@ use Filament\Models\Contracts\FilamentUser;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -337,7 +338,10 @@ class ReporteImpactoAviarResource extends Resource
                     ->dateTime('d/m/Y'),
             ])->defaultSort('created_at', 'desc')
             ->filters([
-                //
+                SelectFilter::make('aerolinea')->label('Aerolínea')
+                ->relationship('aerolinea', 'nombre'),
+                SelectFilter::make('aerodromo')->label('Aeropuerto')
+                ->relationship('aerodromo', 'nombre'),
             ])
             ->actions([
             //Vista view
@@ -370,12 +374,7 @@ class ReporteImpactoAviarResource extends Resource
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('danger')
                 ->url(fn($record) => route('report.pdf', $record->id))
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+        ]);
     }
 
     public static function getRelations(): array
