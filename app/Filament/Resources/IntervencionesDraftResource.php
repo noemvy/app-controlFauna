@@ -32,25 +32,6 @@ class IntervencionesDraftResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-        /*--------------------------------------------------Datos del Evento----------------------------------*/
-        Forms\Components\Section::make('Datos del Evento')
-        ->schema([
-        Forms\Components\Select::make('tipo_evento')
-            ->label('Tipo de Evento')
-            ->options([
-                'Dispersión'=>'Dispersión',
-                'Recogida' => 'Recogida'
-            ])
-            ->required(),
-        Forms\Components\Select::make('origen')
-            ->label('Origen del Reporte')
-            ->options([
-                'TWR' => 'TWR',
-                'SSEI'=>'SSEI',
-                'AVSEC'=>'AVSEC',
-            ])
-            ->required(),
-        ])->columns(2),
 /*-----------------------------------------Datos de las especies🦜--------------------------------------*/
         Forms\Components\Section::make('Datos de la Fauna')
             ->schema([
@@ -176,6 +157,7 @@ class IntervencionesDraftResource extends Resource
         Forms\Components\TextInput::make('cantidad_utilizada')
             ->label('Cantidad a utilizar')
             ->numeric()
+            ->nullable()
             ->required(fn (callable $get) => $get('es_consumible') === 1)
             ->visible(fn (callable $get) => $get('es_consumible') === 1),
             ]),
