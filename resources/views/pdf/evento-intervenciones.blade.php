@@ -6,61 +6,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reporte de Impacto con Fauna {{ $reporte->codigo }}</title>
     <style>
-        /* Estilos generales de la página */
         @page {
-            /* Margen de la página */
             margin: 0.5in;
-            /* Mantener un margen razonable */
         }
 
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            /* Eliminar margen por defecto del body */
-            /* Padding dentro del body, ajusta si necesitas más espacio al borde */
             padding: 0.5in;
-            /* Usar padding en lugar de margin en body para controlar el área de contenido */
             font-size: 12px;
             line-height: 1.5;
         }
 
-        /* Estilos del encabezado */
         .header {
             background-color: #004080;
-            /* Azul oscuro */
             color: white;
-            /* Letras blancas */
             text-align: center;
             padding: 15px;
             font-size: 20px;
             font-weight: bold;
-            /* Evita que el encabezado se separe de la primera parte del contenido */
             page-break-after: avoid;
         }
 
-        /* Estilos del contenedor principal de contenido */
         .content {
             margin-top: 20px;
         }
 
-        /* Estilos de las tablas de sección */
-        table.section-table {
-            /* Usamos una nueva clase para las tablas de sección */
-            width: 100%;
-            /* Asegura que la tabla use todo el ancho disponible */
-            border-collapse: collapse;
-            /* Elimina el espacio entre bordes de celdas */
-            margin-top: 10px;
-            /* Espacio entre secciones/tablas */
-            margin-bottom: 20px;
-            /* Espacio después de cada tabla */
-            page-break-inside: auto;
-            /* Permite que la tabla se rompa entre páginas si es necesario */
-            table-layout: auto;
-            /* Permitir ajuste automático basado en contenido y anchos */
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 5px;
+            page-break-after: avoid;
         }
 
-        /* Estilos de las celdas de encabezado y datos de las tablas de sección */
+        table.section-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            page-break-inside: auto;
+            table-layout: auto;
+        }
+
         .section-table th,
         .section-table td {
             border: 1px solid black;
@@ -68,66 +56,124 @@
             text-align: left;
             vertical-align: top;
             white-space: pre-wrap;
-            /* Mantiene los saltos de línea existentes en el texto */
             word-break: break-word;
-            /* Permite que palabras largas se rompan para evitar desbordamiento */
         }
 
-        /* --- Ajustes para aprovechar el ancho y mejorar la presentación en tablas de sección --- */
-
-        /* Define anchos relativos para las columnas 'Campo' y 'Dato' */
-        /* La primera columna ('Campo') */
         .section-table td:nth-child(1) {
             width: 40%;
-            /* Ajusta este porcentaje para el nombre del campo */
         }
 
-        /* La segunda columna ('Dato') */
         .section-table td:nth-child(2) {
             width: 60%;
-            /* Usa el porcentaje restante para la columna de datos */
         }
 
-        /* Estilos para los títulos de sección */
-        .section-title {
-            font-size: 16px;
-            font-weight: bold;
-            margin-top: 20px;
-            /* Espacio antes del título de sección */
-            margin-bottom: 5px;
-            /* Espacio después del título */
-            page-break-after: avoid;
-            /* Evita que el título se separe de la tabla siguiente */
-        }
-
-
-        /* --- Reglas de salto de página --- */
-
-        /* Regla para filas de tablas de sección */
         .section-table tr {
             page-break-inside: avoid;
-            /* Evita que una fila individual se rompa entre páginas */
             page-break-after: auto;
-            /* Permite un salto de página después de una fila si es necesario */
         }
 
-
         .page-break {
-            /* Fuerza un salto de página antes del elemento con esta clase */
             page-break-before: always;
         }
 
-        /* Permite que estos elementos se rompan internamente si es necesario */
-        div,
-        p,
-        td {
+        div, p, td {
             page-break-inside: auto;
+        }
+
+        /* Estilos específicos para tabla de municiones */
+        .municiones-table {
+            table-layout: fixed; /* Fuerza el ancho fijo de las columnas */
+        }
+
+        .municiones-table th,
+        .municiones-table td {
+            text-align: center;
+            white-space: nowrap; /* Evita que el texto se rompa en líneas múltiples */
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .municiones-table thead tr th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        /* Anchos específicos para columnas de municiones */
+        .municiones-table th:nth-child(1),
+        .municiones-table td:nth-child(1) {
+            width: 50%; /* Nombre */
+        }
+
+        .municiones-table th:nth-child(2),
+        .municiones-table td:nth-child(2) {
+            width: 30%; /* Acción */
+        }
+
+        .municiones-table th:nth-child(3),
+        .municiones-table td:nth-child(3) {
+            width: 20%; /* Cantidad */
+        }
+
+        /* Alternativa: Si quieres que el texto se ajuste pero manteniendo el layout */
+        .municiones-table-alt th,
+        .municiones-table-alt td {
+            text-align: center;
+            white-space: normal; /* Permite salto de línea natural */
+            word-wrap: break-word;
+            hyphens: auto;
+        }
+
+        .municiones-table-alt th:nth-child(1),
+        .municiones-table-alt td:nth-child(1) {
+            width: 45%;
+        }
+
+        .municiones-table-alt th:nth-child(2),
+        .municiones-table-alt td:nth-child(2) {
+            width: 35%;
+        }
+
+        .municiones-table-alt th:nth-child(3),
+        .municiones-table-alt td:nth-child(3) {
+            width: 20%;
+            min-width: 80px; /* Ancho mínimo para evitar texto vertical */
+        }
+
+        /* Estilos específicos para tabla de actualizaciones */
+        .actualizaciones-table {
+            table-layout: fixed;
+        }
+
+        .actualizaciones-table th,
+        .actualizaciones-table td {
+            text-align: left;
+            vertical-align: top;
+            word-wrap: break-word;
+        }
+
+        .actualizaciones-table th:nth-child(1),
+        .actualizaciones-table td:nth-child(1) {
+            width: 15%; /* Fecha */
+        }
+
+        .actualizaciones-table th:nth-child(2),
+        .actualizaciones-table td:nth-child(2) {
+            width: 20%; /* Autor */
+        }
+
+        .actualizaciones-table th:nth-child(3),
+        .actualizaciones-table td:nth-child(3) {
+            width: 65%; /* Actualización - más ancho */
+        }
+
+        .actualizaciones-table thead tr th {
+            background-color: #f2f2f2;
+            font-weight: bold;
         }
     </style>
 </head>
 
 <body>
-
     {{-- Encabezado --}}
     <div class="header">
         Tocumen S.A <br>
@@ -137,7 +183,7 @@
 
     <div class="content">
 
-        {{-- Sección: DATOS DEL EVENTO --}}
+        {{-- Sección: Eventos --}}
         <div class="section-title">Eventos - Intervenciones</div>
         <table class="section-table">
             <tbody>
@@ -151,30 +197,31 @@
                 </tr>
             </tbody>
         </table>
-        {{-- Seccion: Datos del Clima  --}}
+
+        {{-- Sección: Clima --}}
         <div class="section-title">Datos de Ubicación y Clima</div>
         <table class="section-table">
-            <tr>
-                <td>Coordenada X:</td>
-                <td>{{ $reporte->coordenada_x }}</td>
-            </tr>
-        <tr>
-            <td>Coordenada Y:</td>
-            <td>{{ $reporte->coordenada_y }}</td>
-        </tr>
-        <tr>
-            <td>Temperatura:</td>
-            <td>{{ $reporte->temperatura }} °C</td>
-        </tr>
-        <tr>
-            <td>Viento:</td>
-            <td>{{ $reporte->viento }} m/s</td>
-        </tr>
-        <tr>
-            <td>Humedad:</td>
-            <td>{{ $reporte->humedad }} %</td>
-        </tr>
-
+            <tbody>
+                <tr>
+                    <td>Coordenada X:</td>
+                    <td>{{ $reporte->coordenada_x }}</td>
+                </tr>
+                <tr>
+                    <td>Coordenada Y:</td>
+                    <td>{{ $reporte->coordenada_y }}</td>
+                </tr>
+                <tr>
+                    <td>Temperatura:</td>
+                    <td>{{ $reporte->temperatura }} °C</td>
+                </tr>
+                <tr>
+                    <td>Viento:</td>
+                    <td>{{ $reporte->viento }} m/s</td>
+                </tr>
+                <tr>
+                    <td>Humedad:</td>
+                    <td>{{ $reporte->humedad }} %</td>
+                </tr>
             </tbody>
         </table>
 
@@ -203,36 +250,70 @@
                     <td>{{ $reporte->dispersados }}</td>
                 </tr>
                 <tr>
-                    <td>Cantidad :</td>
+                    <td>Cantidad:</td>
                     <td>{{ $reporte->sacrificados }}</td>
                 </tr>
             </tbody>
         </table>
 
-        {{-- Sección: Munición Utilizada --}}
-<div class="section-title">Equipo/Munición Utilizada</div>
+        {{-- Sección: Munición Utilizada - VERSIÓN CORREGIDA --}}
+        @if($reporte->pivoteEvento->isNotEmpty())
+            <div class="section-title">Equipo/Munición Utilizada</div>
+            <table class="section-table municiones-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Acción</th>
+                        <th>Cant.</th> {{-- Texto más corto para evitar problemas --}}
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($reporte->pivoteEvento as $item)
+                        <tr>
+                            <td>{{ $item->catalogoInventario->nombre ?? 'Sin nombre' }}</td>
+                            <td>{{ $item->acciones->nombre ?? 'Sin acción' }}</td>
+                            <td>{{ $item->cantidad_utilizada }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @else
+            <p>No se usaron municiones ni equipos en esta intervención.</p>
+        @endif
 
-<table class="section-table">
-    <tbody>
-        @foreach ($municionesInfo as $municion)
-            <tr>
-                <td>{{ $municion['nombre'] }}</td>
-                <td>{{ $municion['accion'] }}</td>
-                <td>{{ $municion['cantidad_utilizada'] }}</td>
-            </tr>
-        @endforeach
-    </tbody>
-</table>
-
-
-
-        {{-- Sección: Municion Utilizada --}}
+        {{-- Comentarios --}}
         <div class="section-title">Comentarios</div>
         <table class="section-table">
+            <tbody>
+                <tr>
+                    <td>Comentarios:</td>
+                    <td>{{ $reporte->comentarios }}</td>
+                </tr>
+            </tbody>
+        </table>
+    {{-- ACTUALIZACIONES --}}
+    @if($reporte->actualizacionesEvento->isNotEmpty())
+    <div class="section-title">Actualizaciones del Reporte</div>
+    <table class="section-table actualizaciones-table">
+        <thead>
             <tr>
-                <td>Comentarios:</td>
-                <td>{{$reporte->comentarios}}</td>
+                <th>Fecha</th>
+                <th>Autor</th>
+                <th>Actualización</th>
             </tr>
-    </div>
+        </thead>
+        <tbody>
+            @foreach($reporte->actualizacionesEvento as $actualizacion)
+                <tr>
+                    <td>{{ \Carbon\Carbon::parse($actualizacion->created_at)->timezone('America/Panama')->format('d/m/Y h:i A') }}</td>
+                    <td>{{ $actualizacion->user->name ?? 'N/A' }}</td>
+                    <td>{{ $actualizacion->actualizacion ?? 'Sin contenido' }}</td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+@else
+    <p>No hay actualizaciones para este reporte.</p>
+@endif
 </body>
 </html>

@@ -7,28 +7,25 @@
     <style>
         /* Estilos generales de la página */
         @page {
-            /* Margen de la página */
-            margin: 0.5in; /* Mantener un margen razonable */
+            margin: 0.5in;
         }
 
         body {
             font-family: Arial, sans-serif;
-            margin: 0; /* Eliminar margen por defecto del body */
-            /* Padding dentro del body, ajusta si necesitas más espacio al borde */
-            padding: 0.5in; /* Usar padding en lugar de margin en body para controlar el área de contenido */
+            margin: 0;
+            padding: 0.5in;
             font-size: 12px;
             line-height: 1.5;
         }
 
         /* Estilos del encabezado */
         .header {
-            background-color: #004080; /* Azul oscuro */
-            color: white; /* Letras blancas */
+            background-color: #004080;
+            color: white;
             text-align: center;
             padding: 15px;
             font-size: 20px;
             font-weight: bold;
-            /* Evita que el encabezado se separe de la primera parte del contenido */
             page-break-after: avoid;
         }
 
@@ -38,13 +35,13 @@
         }
 
         /* Estilos de las tablas de sección */
-        table.section-table { /* Usamos una nueva clase para las tablas de sección */
-            width: 100%; /* Asegura que la tabla use todo el ancho disponible */
-            border-collapse: collapse; /* Elimina el espacio entre bordes de celdas */
-            margin-top: 10px; /* Espacio entre secciones/tablas */
-            margin-bottom: 20px; /* Espacio después de cada tabla */
-            page-break-inside: auto; /* Permite que la tabla se rompa entre páginas si es necesario */
-            table-layout: auto; /* Permitir ajuste automático basado en contenido y anchos */
+        table.section-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            page-break-inside: auto;
+            table-layout: auto;
         }
 
         /* Estilos de las celdas de encabezado y datos de las tablas de sección */
@@ -54,52 +51,90 @@
             padding: 8px;
             text-align: left;
             vertical-align: top;
-            white-space: pre-wrap; /* Mantiene los saltos de línea existentes en el texto */
-            word-break: break-word; /* Permite que palabras largas se rompan para evitar desbordamiento */
+            white-space: pre-wrap;
+            word-break: break-word;
         }
-
-        /* --- Ajustes para aprovechar el ancho y mejorar la presentación en tablas de sección --- */
 
         /* Define anchos relativos para las columnas 'Campo' y 'Dato' */
-        /* La primera columna ('Campo') */
         .section-table td:nth-child(1) {
-            width: 40%; /* Ajusta este porcentaje para el nombre del campo */
+            width: 40%;
         }
 
-        /* La segunda columna ('Dato') */
         .section-table td:nth-child(2) {
-            width: 60%; /* Usa el porcentaje restante para la columna de datos */
+            width: 60%;
         }
 
         /* Estilos para los títulos de sección */
         .section-title {
             font-size: 16px;
             font-weight: bold;
-            margin-top: 20px; /* Espacio antes del título de sección */
-            margin-bottom: 5px; /* Espacio después del título */
-            page-break-after: avoid; /* Evita que el título se separe de la tabla siguiente */
+            margin-top: 20px;
+            margin-bottom: 5px;
+            page-break-after: avoid;
         }
 
-
-        /* --- Reglas de salto de página --- */
-
-        /* Regla para filas de tablas de sección */
+        /* Reglas de salto de página */
         .section-table tr {
-            page-break-inside: avoid; /* Evita que una fila individual se rompa entre páginas */
-            page-break-after: auto; /* Permite un salto de página después de una fila si es necesario */
+            page-break-inside: avoid;
+            page-break-after: auto;
         }
-
 
         .page-break {
-            /* Fuerza un salto de página antes del elemento con esta clase */
             page-break-before: always;
         }
 
-        /* Permite que estos elementos se rompan internamente si es necesario */
         div, p, td {
             page-break-inside: auto;
         }
 
+        /* Estilos específicos para tabla de actualizaciones */
+        .actualizaciones-table {
+            table-layout: fixed;
+        }
+
+        .actualizaciones-table th,
+        .actualizaciones-table td {
+            text-align: left;
+            vertical-align: top;
+            word-wrap: break-word;
+        }
+
+        .actualizaciones-table th:nth-child(1),
+        .actualizaciones-table td:nth-child(1) {
+            width: 15%; /* Fecha */
+        }
+
+        .actualizaciones-table th:nth-child(2),
+        .actualizaciones-table td:nth-child(2) {
+            width: 20%; /* Autor */
+        }
+
+        .actualizaciones-table th:nth-child(3),
+        .actualizaciones-table td:nth-child(3) {
+            width: 65%; /* Actualización - más ancho */
+        }
+
+        .actualizaciones-table thead tr th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        /* Estilos para el bloque de observaciones */
+        .observations-block {
+            border: 1px solid black;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        .observations-block strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .observations-block p {
+            margin: 0;
+            white-space: pre-wrap;
+        }
     </style>
 </head>
 <body>
@@ -162,9 +197,9 @@
         {{-- Sección: Advertencia --}}
         <div class="section-title">Advertencia</div>
         <table class="section-table">
-             <tbody>
+            <tbody>
                 <tr>
-                    <td>¿Fue advertido por tránsito aéreo de la condición por Fauna? * </td>
+                    <td>¿Fue advertido por tránsito aéreo de la condición por Fauna? *</td>
                     <td>
                         @if (is_null($reporte->advertencia))
                             No especificado
@@ -177,7 +212,6 @@
                 </tr>
             </tbody>
         </table>
-
 
         {{-- Sección: Condiciones Atmosféricas y de Vuelo --}}
         <div class="section-title">Condiciones Atmosféricas y de Vuelo</div>
@@ -200,7 +234,7 @@
                     <td>{{ round($reporte->temperatura) }} °C</td>
                 </tr>
                 <tr>
-                    <td>Velocidad a la que impactó (m/s):</td>
+                    <td>Velocidad del Viento (m/s):</td>
                     <td>{{ $reporte->viento_velocidad }}</td>
                 </tr>
                 <tr>
@@ -213,11 +247,6 @@
                 </tr>
             </tbody>
         </table>
-
-        {{-- SALTO DE PÁGINA ANTES DE "Detalles de Fauna" (Opcional, ajusta si prefieres que rompa naturalmente) --}}
-        {{-- Puedes usar un div o simplemente confiar en page-break-inside/after --}}
-        {{-- <div class="page-break"></div> --}}
-
 
         {{-- Sección: Detalles de Fauna --}}
         <div class="section-title">Detalles de Fauna</div>
@@ -246,24 +275,20 @@
         <div class="section-title">Piezas Afectadas</div>
         <table class="section-table">
             <tbody>
-                {{-- Piezas Golpeadas --}}
                 <tr>
                     <td>Piezas Golpeadas:</td>
                     <td>
                         @if (!empty($partesGolpeadas) && count($partesGolpeadas) > 0)
-                            {{-- Unir los nombres con coma y espacio --}}
                             {{ $partesGolpeadas->pluck('nombre')->join(', ') }}
                         @else
                             No hay piezas golpeadas.
                         @endif
                     </td>
                 </tr>
-                {{-- Piezas Dañadas --}}
                 <tr>
                     <td>Piezas Dañadas:</td>
                     <td>
                         @if (!empty($partesDanadas) && count($partesDanadas) > 0)
-                            {{-- Unir los nombres con coma y espacio --}}
                             {{ $partesDanadas->pluck('nombre')->join(', ') }}
                         @else
                             No hay piezas dañadas.
@@ -273,31 +298,30 @@
             </tbody>
         </table>
 
-
         {{-- Sección: Afectaciones --}}
         <div class="section-title">Afectaciones</div>
         <table class="section-table">
             <tbody>
                 <tr>
-                    <td>Consecuencia: </td>
+                    <td>Consecuencia:</td>
                     <td>{{ $reporte->consecuencia }}</td>
                 </tr>
                 <tr>
-                    <td>Tiempo de la aeronave fuera de servicio: </td>
+                    <td>Tiempo de la aeronave fuera de servicio:</td>
                     <td>{{ $reporte->tiempo_fs }} Horas</td>
                 </tr>
                 <tr>
-                    <td>Costo estimado en reparaciones o reemplazo de piezas: </td>
+                    <td>Costo estimado en reparaciones o reemplazo de piezas:</td>
                     <td>${{ $reporte->costo_reparacion }}</td>
                 </tr>
                 <tr>
-                    <td>Otros costos Estimados: </td>
+                    <td>Otros costos Estimados:</td>
                     <td>${{ $reporte->costo_otros }}</td>
                 </tr>
             </tbody>
         </table>
 
-        {{-- Sección: Observaciones (Fuera de la tabla) --}}
+        {{-- Sección: Observaciones --}}
         <div class="section-title">Observaciones</div>
         <div class="observations-block">
             <strong>Comentarios:</strong>
@@ -322,6 +346,31 @@
                 </tr>
             </tbody>
         </table>
+
+        {{-- ACTUALIZACIONES --}}
+        @if($reporte->actualizaciones->isNotEmpty())
+        <div class="section-title">Actualizaciones del Reporte</div>
+        <table class="section-table actualizaciones-table">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Autor</th>
+                    <th>Actualización</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($reporte->actualizaciones as $actualizacion)
+                    <tr>
+                        <td>{{ \Carbon\Carbon::parse($actualizacion->created_at)->timezone('America/Panama')->format('d/m/Y h:i A') }}</td>
+                        <td>{{ $actualizacion->user->name ?? 'N/A' }}</td>
+                        <td>{{ $actualizacion->actualizacion ?? 'Sin contenido' }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+        @else
+        <p>No hay actualizaciones para este reporte.</p>
+        @endif
 
     </div>
 
