@@ -39,13 +39,7 @@ class MovimientoInventarioRelationManager extends RelationManager
             ->columns([
             Tables\Columns\TextColumn::make('tipo_movimiento')->label('Tipo de Movimiento'),
             Tables\Columns\TextColumn::make('cantidad_usar')
-            ->label('Cantidad')
-            ->formatStateUsing(function ($state, $record) {
-                if (strtolower($record->tipo_movimiento) === 'transferencia' && $record->transferencia) {
-                    return $record->transferencia->cantidad;
-                }
-                return $state;
-            }),
+            ->label('Cantidad'),
             Tables\Columns\TextColumn::make('stock_actual')
             ->label('Stock Disponible')
             ->getStateUsing(function ($record) {
@@ -211,8 +205,8 @@ class MovimientoInventarioRelationManager extends RelationManager
             Forms\Components\Select::make('tipo_movimiento')
                 ->label('Tipo de Movimiento')
                 ->options([
-                    'ajuste' => 'Ajuste',
-                ])->default('ajuste')
+                    'Ajuste' => 'Ajuste',
+                ])->default('Ajuste')
                 ->required()->disabled()->dehydrated(true),
             Forms\Components\Select::make('user_id')
                 ->label('Usuario')
@@ -243,16 +237,16 @@ class MovimientoInventarioRelationManager extends RelationManager
             }
             // Actualiza el stock actual directamente
             $inventario->cantidad_actual = $data['cantidad_ajustada'];
-            $inventario->save();
-            // Crea un registro en movimiento_inventario como "Ajuste"
             MovimientoInventario::create([
                 'aerodromo_id' => $data['aerodromo_id'],
                 'catinventario_id' => $data['catinventario_id'],
                 'tipo_movimiento' => $data['tipo_movimiento'],
-                'cantidad_usar' => 0,
+                'cantidad_usar' => $data['cantidad_ajustada'] ,
                 'user_id' => $data['user_id'],
                 'comentario' => $data['comentario'],
             ]);
+            $inventario->save();
+            // Crea un registro en movimiento_inventario como "Ajuste
             Notification::make()
                 ->title('Ajuste realizado correctamente')
                 ->success()
