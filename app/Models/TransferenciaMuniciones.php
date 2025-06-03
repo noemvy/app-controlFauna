@@ -98,9 +98,9 @@ class TransferenciaMuniciones extends Model
                 'catinventario_id' => $transferencia->catinventario_id,
                 'tipo_movimiento' => 'Transferencia',
                 'user_id' => $transferencia->user_id,
-                'cantidad_usar' => 0,
+                'cantidad_usar' => $transferencia->cantidad ,
                 'comentarios' => 'Transferencia hacia aeropuerto ID: ' . $transferencia->aerodromo_destino_id,
-                'transferencia_id' => $transferencia->id, // 👈 Aquí
+                'transferencia_id' => $transferencia->id, 
             ]);
 
             // Registrar movimiento de entrada para que guarde como tipo de movimiento de transferencia en la tabla movimiento y cuente como movimiento de entrada en
@@ -110,9 +110,9 @@ class TransferenciaMuniciones extends Model
                 'catinventario_id' => $transferencia->catinventario_id,
                 'tipo_movimiento' => 'Transferencia',
                 'user_id' => $transferencia->user_id,
-                'cantidad_usar' => 0,
+                'cantidad_usar' => $transferencia->cantidad,
                 'comentarios' => 'Transferencia desde aeropuerto ID: ' . $transferencia->aerodromo_origen_id,
-                'transferencia_id' => $transferencia->id, // 👈 Aquí
+                'transferencia_id' => $transferencia->id,
             ]);
 
         });
@@ -121,5 +121,4 @@ class TransferenciaMuniciones extends Model
 
     }
 }
-
 
