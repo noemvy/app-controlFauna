@@ -53,6 +53,8 @@ class PatrullajeResource extends Resource
                     ])
                     ->required()
                     ->default('en_proceso')
+                    ->disabled()
+                    ->dehydrated(true)
                     ->reactive(),
             Forms\Components\TextInput::make('inicio')
                     ->label('Inicio')
@@ -96,7 +98,7 @@ class PatrullajeResource extends Resource
                 Tables\Columns\TextColumn::make('fin')->label('Hora de Finalización'),
             ])->defaultSort('created_at', 'desc')
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                
             ])
             ->filters([
                 //
