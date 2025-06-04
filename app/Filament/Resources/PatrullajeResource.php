@@ -28,13 +28,13 @@ class PatrullajeResource extends Resource
     {
         return $form
             ->schema([
-            Forms\Components\Select::make('aerodromo_id')
-                ->label('Aeropuerto')
-                ->options(Aerodromo::pluck('nombre', 'id'))
-                ->required()
-                ->default(Filament::auth()->user()->aerodromo_id)
-                ->disabled()
-                ->dehydrated(true),
+                Forms\Components\Select::make('aerodromo_id')
+                    ->label('Aeropuerto')
+                    ->options(Aerodromo::pluck('nombre', 'id'))
+                    ->required()
+                    ->default(Filament::auth()->user()->aerodromo_id)
+                    ->disabled()
+                    ->dehydrated(true),
 
                 Forms\Components\Select::make('user_id')
                     ->label('Usuario')
@@ -46,49 +46,48 @@ class PatrullajeResource extends Resource
 
                 Forms\Components\Select::make('estado')
                     ->label('Estado')
-
                     ->options([
                         'en_proceso' => '🟢En Proceso',
-                        'finalizacion' => '🔴Finalización',
+                        'finalizado' => '🔴Finalizado',
                     ])
                     ->required()
                     ->default('en_proceso')
                     ->disabled()
                     ->dehydrated(true)
                     ->reactive(),
-            Forms\Components\TextInput::make('inicio')
+
+                Forms\Components\TextInput::make('inicio')
                     ->label('Inicio')
                     ->default(Carbon::now('America/Panama')->format('Y-m-d H:i:s'))
                     ->required()
                     ->disabled()
                     ->dehydrated(true),
-            Forms\Components\TextArea::make('comentarios')
+
+                Forms\Components\TextArea::make('comentarios')
                     ->label('Comentarios')
                     ->maxLength(250)
                     ->columnSpanFull(),
-            /*EL CAMPO FIN ESTA EN EL ARCHIVO CreatePatrullaje */
-            Forms\Components\Section::make('Acciones')
+
+                Forms\Components\Section::make('Acciones')
                     ->schema([
-                    Actions::make([
-                    Action::make('agregar_intervencion')
-                    ->label('Nueva Intervención')
-                    ->url(route('filament.dashboard.resources.intervenciones-drafts.create', ['returnTo' => 'patrullaje']))
-                    ->icon('heroicon-o-plus')
-                    ->color('success')
+                        Actions::make([
+                            Action::make('agregar_intervencion')
+                                ->label('Nueva Intervención')
+                                ->url(route('filament.dashboard.resources.intervenciones-drafts.create', ['returnTo' => 'patrullaje']))
+                                ->icon('heroicon-o-plus')
+                                ->color('success'),
+                        ]),
+                        Forms\Components\Placeholder::make('conteoIntervenciones')
+                            ->label('')
+                            ->content(function () {
+                                $userId = Filament::auth()->id();
+                                $count = \App\Models\IntervencionesDraft::where('user_id', $userId)->count();
+                                return "Total: {$count} intervención(es) creadas";
+                            }),
                     ]),
-                    Forms\Components\Placeholder::make('conteoIntervenciones')
-                    ->label('')
-                    ->content(function () {
-                        $userId = Filament::auth()->id();
-
-                        $count = \App\Models\IntervencionesDraft::where('user_id', $userId)->count();
-
-                        return "Total: {$count} intervención(es) creadas";
-                    }),
-
-            ])
-        ]);
+            ]);
     }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -96,17 +95,29 @@ class PatrullajeResource extends Resource
                 Tables\Columns\TextColumn::make('user.name')->label('Usuario'),
                 Tables\Columns\TextColumn::make('inicio')->label('Hora de Inicio'),
                 Tables\Columns\TextColumn::make('fin')->label('Hora de Finalización'),
-            ])->defaultSort('created_at', 'desc')
+            ])
+            ->defaultSort('created_at', 'desc')
             ->actions([
-                
+                Tables\Actions\Action::make('ver_detalles')
+                ->label('Ver Detalles')
+                ->icon('heroicon-o-eye')
+                ->modalHeading('Detalles del Patrullaje')
+                ->modalSubmitAction(false)
+                ->modalCancelActionLabel('Cerrar')
+                ->modalContent(function ($record) {
+                    return view('components.patrullaje-detalles', compact('record'));
+                }),
+
             ])
             ->filters([
-                //
+                // Filtros opcionales
             ]);
     }
+
     public static function getRelations(): array
     {
         return [
+            //
         ];
     }
 
