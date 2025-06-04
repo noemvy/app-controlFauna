@@ -34,10 +34,12 @@ class MovimientoInventario extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
-    public function transferencia()
+
+    public function transferenciaMuniciones()
 {
     return $this->belongsTo(TransferenciaMuniciones::class, 'transferencia_id');
 }
+
 
 
 
