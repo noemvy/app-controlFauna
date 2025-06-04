@@ -39,9 +39,7 @@ class MovimientoInventarioRelationManager extends RelationManager
             ->columns([
             Tables\Columns\TextColumn::make('tipo_movimiento')->label('Tipo de Movimiento'),
             Tables\Columns\TextColumn::make('cantidad_usar')
-            ->label('Cantidad'),
-            Tables\Columns\TextColumn::make('stock_actual')
-            ->label('Stock Disponible')
+            ->label('Cantidad')
             ->getStateUsing(function ($record) {
                 $inventario = InventarioMuniciones::where('aerodromo_id', $record->aerodromo_id)
                     ->where('catinventario_id', $record->catinventario_id)
@@ -54,7 +52,20 @@ class MovimientoInventarioRelationManager extends RelationManager
             ->dateTime('d/m/Y')
             ->sortable(),
             Tables\Columns\TextColumn::make('user.name')->label('Responsable')->searchable(),
+
         ])->defaultSort('created_at', 'desc')
+        ->actions([
+            Tables\Actions\Action::make('ver_detalles')
+            ->label('Ver Detalles')
+            ->icon('heroicon-o-eye')
+            ->modalHeading('Detalles')
+            ->modalSubmitAction(false)
+            ->modalCancelActionLabel('Cerrar')
+            ->modalContent(function ($record) {
+                return view('components.transferencia-detalles', compact('record'));
+            })
+            ->visible(fn ($record) => $record->tipo_movimiento === 'Transferencia'),
+        ])
         /*--------------------------------------FILTROS----------------------------------------------------------*/
         ->filters([
             SelectFilter::make('tipo_movimiento')
@@ -68,6 +79,8 @@ class MovimientoInventarioRelationManager extends RelationManager
                 'Transferencia' => 'Transferencia',
             ])
         ])
+
+
         /*-------------------------------------BOTÓN DE 🟢ENTRADA------------------------------------------------- */
         ->headerActions([
         Tables\Actions\Action::make('entrada')
@@ -109,6 +122,7 @@ class MovimientoInventarioRelationManager extends RelationManager
                 ->label('Cantidad del movimiento')->numeric()->required(),
             Forms\Components\Textarea::make('comentario')
                 ->label('Comentario')->maxLength(255)->columnSpanFull(),
+
         ])
         ])
         /*-----------------------------LOGICA PARA CREAR MOVIMIENTOS - La logica se encuentra en el modelo MovimientoInventario---------------------------------------------------*/
