@@ -54,6 +54,10 @@ class Aerodromo extends Model
     {
         return $this->hasMany(Evento::class, 'aerodromo_id');
     }
+    public function transferencias()
+    {
+        return $this->hasMany(TransferenciaMuniciones::class, 'aerodromo_id');
+    }
 
 
 
