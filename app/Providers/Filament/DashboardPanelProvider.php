@@ -87,6 +87,35 @@ class DashboardPanelProvider extends PanelProvider
                     font-weight: 700;
                 }
 
+                .fi-notification {
+                    font-size: 1rem; /* Tamaño de texto */
+                    padding: 1rem;
+                }
+                    /* Estilo general de la notificación */
+    .fi-notification {
+        font-size: 1.05rem;
+        padding: 1.25rem;
+        border-radius: 12px;
+    }
+
+    /* Estilo del título de la notificación */
+    .fi-notification .fi-notification-title {
+        font-size: 1.25rem;
+        font-weight: 700; /* Negrita */
+    }
+
+    /* Estilo del cuerpo (mensaje) de la notificación */
+    .fi-notification .fi-notification-body {
+        font-size: 1.1rem;
+        font-weight: 600; /* Semi-negrita */
+    }
+
+    /* Personalización opcional por tipo */
+    .fi-notification[data-theme="warning"] {
+        background-color: #fef08a !important;
+        color: #78350f !important;
+    }
+
             </style>
             ')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
