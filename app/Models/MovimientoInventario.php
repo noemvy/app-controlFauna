@@ -47,7 +47,7 @@ class MovimientoInventario extends Model
     protected static function booted()
     {
         static::creating(function ($movimiento) {
-        if ($movimiento->tipo_movimiento !== 'Transferencia') {
+        if (!in_array($movimiento->tipo_movimiento, ['Transferencia', 'Ajuste'])){
         self::ajustarInventario($movimiento);
         }
 });
