@@ -28,4 +28,6 @@ class PivoteEvento extends Model
     {
         return $this->belongsTo(Acciones::class, 'acciones_id');
     }
+
+    
 }
