@@ -29,7 +29,7 @@ class Evento extends Model
         return $this->hasMany(Intervenciones::class);
     }
 
-
+    
 
 
 }
