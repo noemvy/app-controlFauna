@@ -4,9 +4,12 @@ namespace App\Filament\Pages;
 
 use App\Models\CatalogoInventario;
 use App\Models\Especie;
+use App\Models\Intervenciones;
+use App\Models\IntervencionesEventoDraft;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Actions\Action;
 use Filament\Forms;
+use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\URL;
 
 class Dashboard extends BaseDashboard
@@ -111,40 +114,61 @@ class Dashboard extends BaseDashboard
                     $query = http_build_query($params);
                     return redirect()->away(URL::route('estadisticas.especies.export-excel') . '?' . $query);
                 }),
+            Action::make('efectividad')
+            ->label('Efectividad De Municiones')
+            ->icon('lucide-target')
+            ->color('warning')
+            ->form([
+                Forms\Components\Select::make('especie_id')
+                    ->label('Especie')
+                    ->multiple()
+                    ->options(Especie::pluck('nombre_cientifico','id'))
+                    ->searchable()
+                    ->placeholder('Todas las especies...'),
 
+                Forms\Components\Select::make('municion_id')
+                    ->label('Munición')
+                    ->multiple()
+                    ->options(CatalogoInventario::pluck('nombre','id'))
+                    ->searchable()
+                    ->placeholder('Todas las municiones...'),
+            ])
+            ->action(function (array $data, $livewire) {
+        // Validación sencilla si hay datos que mostrar
+        $queryEventos = IntervencionesEventoDraft::query();
+        $queryPatrullaje = Intervenciones::query();
 
-                Action::make('efectividad')
-                ->label('Efectividad De Municiones')
-                ->icon('lucide-target')
-                ->color('warning')
-                ->form([
-                    Forms\Components\Select::make('especie_id')
-                        ->label('Especie')
-                        ->options(Especie::pluck('nombre_cientifico','id'))
-                        ->searchable()
-                        ->placeholder('Todas las especies...'),
+        if (!empty($data['especie_id'])) {
+            $queryEventos->whereIn('especies_id', $data['especie_id']);
+            $queryPatrullaje->whereIn('especies_id', $data['especie_id']);
+        }
+        if (!empty($data['municion_id'])) {
+            $queryEventos->whereHas('pivoteEvento', function($q) use ($data) {
+                $q->whereIn('catinventario_id', $data['municion_id']);
+            });
+            $queryPatrullaje->whereHas('pivote', function($q) use ($data) {
+                $q->whereIn('catinventario_id', $data['municion_id']);
+            });
+        }
 
-                    Forms\Components\Select::make('municion_id')
-                        ->label('Munición')
-                        ->options(CatalogoInventario::pluck('nombre','id'))
-                        ->searchable()
-                        ->placeholder('Todas las municiones...'),
-                ])
-                ->action(function (array $data) {
-                    $params = [];
+        $countEventos = $queryEventos->count();
+        $countPatrullaje = $queryPatrullaje->count();
 
-                    if (!empty($data['especie_id'])) {
-                        $params['especie_id'] = $data['especie_id'];
-                    }
+        if ($countEventos + $countPatrullaje === 0) {
+            Notification::make()
+                ->title('No hay datos para exportar con esos filtros')
+                ->danger()
+                ->send();
+            return;
+        }
 
-                    if (!empty($data['municion_id'])) {
-                        $params['municion_id'] = $data['municion_id'];
-                    }
+        $queryParams = http_build_query([
+            'especies' => $data['especie_id'] ?? [],
+            'municiones' => $data['municion_id'] ?? [],
+        ]);
 
-                    $query = http_build_query($params);
-
-                    return redirect()->away(URL::route('estadisticas.efectividad.export-excel') . '?' . $query);
-                }),
+        return redirect()->away(URL::route('estadisticas.efectividad.export-excel') . '?' . $queryParams);
+    }),
 
         ];
     }
