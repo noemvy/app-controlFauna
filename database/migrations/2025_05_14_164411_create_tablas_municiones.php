@@ -17,7 +17,7 @@ return new class extends Migration
                 $table->foreignId('acciones_id')->constrained('acciones')->restrictOnDelete();
                 $table->string('nombre');
                 $table->string('categoria_equipo');
-                $table->boolean('es_consumible')->default(false); 
+                $table->boolean('es_consumible');
                 $table->string('descripcion')->nullable();
                 $table->integer('estado');
                 $table->timestamps();

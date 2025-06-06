@@ -27,5 +27,5 @@ Route::get('/estadisticas-municiones/export-excel', [MunicionesStatsController::
 ->name('estadisticas.municiones.export-excel');
 
 
-Route::get('/estadisticas-efectividad/export-excel', [EfectividadController::class, 'exportExcel'])
+Route::get('/estadisticas-efectividad/export-excel', [EfectividadController::class, 'export'])
 ->name('estadisticas.efectividad.export-excel');
