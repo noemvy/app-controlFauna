@@ -49,13 +49,14 @@ class CatalogoInventarioResource extends Resource
                         'Instrumento' => 'Instrumento',
                     ])
                     ->required(),
-                
+
                 Forms\Components\Select::make('es_consumible')
                     ->label('Tipo de Equipo')
                     ->options([
-                        1 => 'Consumible',
                         0 => 'No Consumible',
+                        1 => 'Consumible',
                     ])
+                    ->default(1)
                     ->required(),
                 Forms\Components\TextInput::make('descripcion')
                     ->label('Descripción del equipo')
