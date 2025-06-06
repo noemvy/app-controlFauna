@@ -15,6 +15,8 @@ use App\Models\PivoteEvento;
 class CreateIntervencionesEventoDraft extends CreateRecord
 {
     protected static string $resource = IntervencionesEventoDraftResource::class;
+
+
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['user_id'] = Filament::auth()->id();
@@ -101,4 +103,7 @@ class CreateIntervencionesEventoDraft extends CreateRecord
     {
         return route('filament.dashboard.resources.intervenciones-evento-drafts.index');
     }
+
+
+
 }

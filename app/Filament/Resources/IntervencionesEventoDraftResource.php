@@ -20,7 +20,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-
+use Filament\Forms\Components\View;
 class IntervencionesEventoDraftResource extends Resource
 {
     protected static ?string $model = IntervencionesEventoDraft::class;
@@ -111,23 +111,13 @@ class IntervencionesEventoDraftResource extends Resource
             Forms\Components\Section::make('Datos del Clima y Ubicación')
             ->schema([
             Forms\Components\TextInput::make('coordenada_x')
-                ->label('Coordenada X')
-                ->numeric()
-                ->step(0.000001)
-                ->disabled()
-                ->dehydrated(true)
-                ->default(fn() => data_get(static::getWeatherData(), 'coord.lat')
-                    ? number_format(data_get(static::getWeatherData(), 'coord.lat'), 8, '.', '')
-                    : null),
-            Forms\Components\TextInput::make('coordenada_y')
-                ->label('Coordenada Y')
-                ->numeric()
-                ->disabled()
-                ->step(0.000001)
-                ->dehydrated(true)
-                ->default(fn() => data_get(static::getWeatherData(), 'coord.lon')
-                    ? number_format(data_get(static::getWeatherData(), 'coord.lon'), 8, '.', '')
-                    : null),
+            ->label('Coordenada X')
+            ->numeric()
+            ->step(0.000001),
+        Forms\Components\TextInput::make('coordenada_y')
+            ->label('Coordenada Y')
+            ->numeric()
+            ->step(0.000001),
             Forms\Components\TextInput::make('temperatura')
                 ->label('Temperatura')
                 ->suffix('°C')
@@ -209,7 +199,8 @@ class IntervencionesEventoDraftResource extends Resource
                 ->default(Filament::auth()->id())
                 ->disabled()
                 ->dehydrated(true),
-            ])
+            ]),
+            // View::make('filament.ubicacion.geo-script')
             ]);
     }
     public static function table(Table $table): Table

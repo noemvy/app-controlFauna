@@ -39,13 +39,7 @@ class MovimientoInventarioRelationManager extends RelationManager
             ->columns([
             Tables\Columns\TextColumn::make('tipo_movimiento')->label('Tipo de Movimiento'),
             Tables\Columns\TextColumn::make('cantidad_usar')
-            ->label('Cantidad')
-            ->getStateUsing(function ($record) {
-                $inventario = InventarioMuniciones::where('aerodromo_id', $record->aerodromo_id)
-                    ->where('catinventario_id', $record->catinventario_id)
-                    ->first();
-                return $inventario ? $inventario->cantidad_actual : 0;
-            }),
+            ->label('Cantidad'),
             Tables\Columns\TextColumn::make('created_at')
             ->label('Fecha y Hora')
             ->formatStateUsing(fn ($state) => Carbon::parse($state)->timezone('America/Panama'))
