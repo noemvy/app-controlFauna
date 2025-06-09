@@ -75,13 +75,7 @@ class DepartamentoResource extends Resource
                         1 => 'Activo',
                         0 => 'Inactivo',
                     ]),
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
-            ]);
+                ]);
     }
 
 

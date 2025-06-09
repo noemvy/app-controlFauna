@@ -20,7 +20,7 @@ class GruposResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-flag';
     protected static ?string $navigationLabel = "Grupo de Animales";
     protected static ?string $navigationGroup = 'Catálogos';
-    protected static ?int $navigationSort = 7;
+    protected static ?int $navigationSort = 999;
     public static function form(Form $form): Form
     {
         return $form
@@ -43,14 +43,6 @@ class GruposResource extends Resource
             ])
             ->filters([
                 //
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
             ]);
     }
 

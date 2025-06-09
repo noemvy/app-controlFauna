@@ -20,7 +20,7 @@ class AccionesResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-flag';
     protected static ?string $navigationLabel = 'Acciones';
     protected static ?string $navigationGroup = 'Catálogos';
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 1000;
 
 
     public static function form(Form $form): Form
@@ -50,12 +50,6 @@ class AccionesResource extends Resource
 
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
             ]);
     }
 

@@ -114,13 +114,7 @@ class DestinatarioResource extends Resource
                         1 => 'Activo',
                         0 => 'Inactivo',
                     ]),
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
-            ]);
+                ]);
     }
 
     public static function getRelations(): array
