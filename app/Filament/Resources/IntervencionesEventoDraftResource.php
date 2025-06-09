@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\IntervencionesEventoDraftResource\Pages;
-use App\Filament\Resources\IntervencionesEventoDraftResource\RelationManagers;
 use App\Models\IntervencionesEventoDraft;
 use App\Models\User;
 use App\Models\Especie;
@@ -21,6 +20,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Components\View;
+
 class IntervencionesEventoDraftResource extends Resource
 {
     protected static ?string $model = IntervencionesEventoDraft::class;
@@ -33,232 +33,200 @@ class IntervencionesEventoDraftResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
+    return $form
+        ->schema([
 /*--------------------------------------------------Datos del Evento----------------------------------*/
-            Forms\Components\Section::make('Datos del Evento')
-            ->schema([
-            Forms\Components\Select::make('tipo_evento')
-                ->label('Tipo de Evento')
-                ->options([
-                    'Dispersión'=>'Dispersión',
-                    'Recogida' => 'Recogida'
-                ])
-                ->required(),
-            Forms\Components\Select::make('origen')
-                ->label('Origen del Reporte')
-                ->options([
-                    'TWR' => 'TWR',
-                    'SSEI'=>'SSEI',
-                    'AVSEC'=>'AVSEC',
-                ])
-                ->required(),
-            ])->columns(2),
-/*-----------------------------------------Datos de las especies🦜--------------------------------------*/
-            Forms\Components\Section::make('Datos de la Fauna')
-            ->schema([
-             //Grupo de especies para obtener el grupo especifico.
-            Forms\Components\Select::make('grupos_id')
-                ->label('Grupo')
-                ->options(Grupo::orderBy('nombre')->pluck('nombre', 'id'))
-                ->reactive()
-                ->required()
-                ->afterStateUpdated(fn (callable $set) => $set('especies_id', null)),
-            //Especies, que dependiendo del grupo se desplieguen las especies del grupo escogido.
-            Forms\Components\Select::make('especies_id')
-                ->label('Especie')
-                ->options(function (callable $get) {
-                    $grupoId = $get('grupos_id');
-                    if (!$grupoId) {
-                        return [];
-                    }
-                    return Especie::where('grupos_id', $grupoId)->orderBy('nombre_cientifico')->pluck('nombre_cientifico', 'id');
-                })
-                ->searchable()
-                ->required()
-                ->disabled(fn (callable $get) => !$get('grupos_id')),
-            //Atractivo para la fauna
-            Forms\Components\Select::make('atractivos_id')
-                ->label('Atractivo')
-                ->options(Atractivo::pluck('nombre', 'id'))
-                ->searchable()
-                ->required(),
-            Forms\Components\Select::make('vistos')
-            ->options(self::getCantidadOptions())
-            ->label('Vistos')
-            ->placeholder('Seleccione una cantidad'),
-            Forms\Components\Select::make('sacrificados')
-            ->label('Sacrificados')
-            ->options(self::getCantidadOptions())
-            ->placeholder('Seleccione una cantidad'),
-            Forms\Components\Select::make('dispersados')
-            ->label('Dispersados')
-            ->options(self::getCantidadOptions())
-            ->placeholder('Seleccione una cantidad'),
-            Forms\Components\FileUpload::make('fotos')
-                    ->label('Fotos')
-                    ->multiple()
-                    ->maxFiles(5)
-                    ->image()
-                    ->disk('public')
-                    ->directory('intervenciones')
-                    ->preserveFilenames()
-                    ->reorderable()
-                    ->nullable()
-                    ->columnSpanFull(),
-            ])->columns(3),
-/*-----------------------------------------Datos del clima⛅--------------------------------------------*/
-            Forms\Components\Section::make('Datos del Clima y Ubicación')
-            ->schema([
-            Forms\Components\TextInput::make('coordenada_x')
-            ->label('Coordenada X')
-            ->numeric()
-            ->step(0.000001),
-        Forms\Components\TextInput::make('coordenada_y')
-            ->label('Coordenada Y')
-            ->numeric()
-            ->step(0.000001),
-            Forms\Components\TextInput::make('temperatura')
-                ->label('Temperatura')
-                ->suffix('°C')
-                ->disabled()
-                ->dehydrated(true)
-                ->default(fn() => data_get(static::getWeatherData(),'main.temp')),
-            Forms\Components\TextInput::make('viento')
-                ->label('Viento')
-                ->numeric()
-                ->disabled()
-                ->dehydrated(true)
-                ->suffix('m/s')
-                ->default(fn() => data_get(static::getWeatherData(),'wind.speed')),
-            Forms\Components\TextInput::make('humedad')
-                ->label('Humedad')
-                ->suffix('%')
-                ->disabled()
-                ->dehydrated(true)
-                ->default(fn() => data_get(static::getWeatherData(),'main.humidity')),
-            ])->columns(5),
-/*----------------------------------------------------SECCIÓN PARA ESCOGER LA CANTIDAD DE MUNICIONES USADAS-------------------------------------------------- */
-        Forms\Components\Section::make('Equipo Utilizado')
+    Forms\Components\Section::make('Datos del Evento')
     ->schema([
-        Forms\Components\Repeater::make('municion_utilizada')
-            ->label('')
-            ->schema([
-                Forms\Components\Grid::make(4) // Agrupamos en una fila de 4 columnas
-                    ->schema([
-                        Forms\Components\Select::make('aerodromo_id')
-                            ->label('Aeropuerto')
-                            ->options(Aerodromo::pluck('nombre', 'id'))
-                            ->required()
-                            ->default(Filament::auth()->user()->aerodromo_id)
-                            ->disabled()
-                            ->dehydrated(true),
-
-                        Forms\Components\Select::make('catinventario_id')
-                            ->label('Herramienta Utilizada:')
-                            ->options(CatalogoInventario::pluck('nombre', 'id'))
-                            ->searchable()
-                            ->reactive()
-                            ->required()
-                            ->dehydrated()
-                            ->afterStateUpdated(function (callable $set, $state) {
-                                $inventario = CatalogoInventario::find($state);
-                                $set('acciones_id', $inventario?->acciones_id);
-                                $set('es_consumible', $inventario?->es_consumible);
-                            }),
-
-                        Forms\Components\Select::make('acciones_id')
-                            ->label('Tipo de Acción Realizada:')
-                            ->options(Acciones::pluck('nombre', 'id'))
-                            ->searchable()
-                            ->required()
-                            ->disabled()
-                            ->dehydrated(),
-                        Forms\Components\Hidden::make('es_consumible')
-                            ->dehydrated(false),
-                        Forms\Components\TextInput::make('cantidad_utilizada')
-                            ->label('Cantidad a utilizar')
-                            ->numeric()
-                            ->required(fn (callable $get) => $get('es_consumible') === 1)
-                            ->visible(fn (callable $get) => $get('es_consumible') === 1),
-                    ]),
-            ])
-            ->defaultItems(1)
-            ->reorderable(false)
+    Forms\Components\Select::make('tipo_evento')
+        ->label('Tipo de Evento')
+        ->options([
+            'Dispersión'=>'Dispersión',
+            'Recogida' => 'Recogida'
+        ])
+        ->required(),
+    Forms\Components\Select::make('origen')
+        ->label('Origen del Reporte')
+        ->options([
+            'TWR' => 'TWR',
+            'SSEI'=>'SSEI',
+            'AVSEC'=>'AVSEC',
+        ])
+        ->required(),
+    ])->columns(2),
+/*-----------------------------------------Datos de las especies🦜--------------------------------------*/
+    Forms\Components\Section::make('Datos de la Fauna')
+    ->schema([
+    Forms\Components\Select::make('grupos_id')
+        ->label('Grupo')
+        ->options(Grupo::orderBy('nombre')->pluck('nombre', 'id'))
+        ->reactive()
+        ->required()
+        ->afterStateUpdated(fn (callable $set) => $set('especies_id', null)),
+    Forms\Components\Select::make('especies_id')
+        ->label('Especie')
+        ->searchable()->required()
+        ->disabled(fn (callable $get) => !$get('grupos_id'))
+        ->options(function (callable $get,  $record) {
+        $grupoId = $get('grupos_id');
+        if (!$grupoId && !$record) {
+            return [];
+        }
+        $query = Especie::query();
+        if ($grupoId) {
+            $query->where('grupos_id', $grupoId);
+        }
+        // Si estamos editando un registro, aseguramos que su especie también se incluya en la lista
+        if ($record && $record->especies_id) {
+            $query->orWhere('id', $record->especies_id);
+        }
+        return $query->orderBy('nombre_cientifico')->pluck('nombre_cientifico', 'id');
+        }),
+    Forms\Components\Select::make('atractivos_id')
+        ->label('Atractivo para la Fauna')
+        ->options(Atractivo::pluck('nombre', 'id'))->searchable()->required(),
+    Forms\Components\Select::make('vistos')
+        ->options(self::getCantidadOptions())->label('Vistos')->placeholder('Seleccione una cantidad'),
+    Forms\Components\Select::make('sacrificados')
+        ->label('Sacrificados')
+        ->options(self::getCantidadOptions())->placeholder('Seleccione una cantidad'),
+    Forms\Components\Select::make('dispersados')
+        ->label('Dispersados')
+        ->options(self::getCantidadOptions())->placeholder('Seleccione una cantidad'),
+    Forms\Components\FileUpload::make('fotos')
+        ->label('Fotos')
+        ->multiple()->maxFiles(5)
+        ->image()->disk('public')
+        ->directory('intervenciones')
+        ->preserveFilenames()->reorderable()->nullable()
+        ->columnSpanFull(),
+    ])->columns(3),
+/*-----------------------------------------Datos del clima⛅--------------------------------------------*/
+    Forms\Components\Section::make('Datos del Clima y Ubicación')
+        ->schema([
+        Forms\Components\TextInput::make('coordenada_x')
+        ->label('Coordenada X')
+        ->id('coordenada_x')->readOnly()->dehydrated(2),
+    Forms\Components\TextInput::make('coordenada_y')
+        ->label('Coordenada Y')
+        ->id('coordenada_y')->readOnly()->dehydrated(true),
+    View::make('components.get-coordenadas'),
+    Forms\Components\TextInput::make('temperatura')
+        ->label('Temperatura')
+        ->suffix('°C')->disabled()->dehydrated(true)
+        ->default(fn() => data_get(static::getWeatherData(),'main.temp')),
+    Forms\Components\TextInput::make('viento')
+        ->label('Viento')
+        ->numeric()->disabled()->dehydrated(true)->suffix('m/s')
+        ->default(fn() => data_get(static::getWeatherData(),'wind.speed')),
+    Forms\Components\TextInput::make('humedad')
+        ->label('Humedad')
+        ->suffix('%')->disabled()->dehydrated(true)
+        ->default(fn() => data_get(static::getWeatherData(),'main.humidity')),
+            ])->columns(6),
+/*----------------------------------------------------SECCIÓN PARA ESCOGER LA CANTIDAD DE MUNICIONES USADAS-------------------------------------------------- */
+    Forms\Components\Section::make('Equipo Utilizado')
+        ->schema([
+    Forms\Components\Repeater::make('municion_utilizada')
+        ->label('')
+        ->schema([
+    Forms\Components\Grid::make(4) // Agrupamos en una fila de 4 columnas
+        ->schema([
+    Forms\Components\Select::make('aerodromo_id')
+        ->label('Aeropuerto')
+        ->options(Aerodromo::pluck('nombre', 'id'))->required()
+        ->default(Filament::auth()->user()->aerodromo_id)
+        ->disabled()->dehydrated(true),
+    Forms\Components\Select::make('catinventario_id')
+        ->label('Herramienta Utilizada:')
+        ->options(CatalogoInventario::pluck('nombre', 'id'))->searchable()
+        ->reactive()->required()->dehydrated()
+        ->afterStateUpdated(function (callable $set, $state) {
+            $inventario = CatalogoInventario::find($state);
+            $set('acciones_id', $inventario?->acciones_id);
+            $set('es_consumible', $inventario?->es_consumible);
+        }),
+    Forms\Components\Select::make('acciones_id')
+        ->label('Tipo de Acción Realizada:')
+        ->options(Acciones::pluck('nombre', 'id'))
+        ->searchable()->required()->disabled()->dehydrated(true),
+    Forms\Components\Hidden::make('es_consumible')
+        ->dehydrated(false),
+    Forms\Components\TextInput::make('cantidad_utilizada')
+        ->label('Cantidad a utilizar')->numeric()
+        ->required(fn (callable $get) => $get('es_consumible') === 1)
+        ->visible(fn (callable $get) => $get('es_consumible') === 1),
+        ]),
+    ])
+    ->defaultItems(1)
+    ->reorderable(false)
     ])
     ->columns(1)
     ->columnSpanFull(),
-
-
-            Forms\Components\Section::make('Comentarios y Usuario')
-            ->schema([
-            Forms\Components\Textarea::make('comentarios')->label('Comentarios')->nullable(),
-            Forms\Components\Select::make('user_id')->label('Usuario')
-                ->options(User::pluck('name', 'id'))
-                ->required()
-                ->default(Filament::auth()->id())
-                ->disabled()
-                ->dehydrated(true),
-            ]),
-            // View::make('filament.ubicacion.geo-script')
+/*----------------------------------------------------------------SECCION COMENTARIOS-------------------------------------------------*/
+    Forms\Components\Section::make('Comentarios y Usuario')
+        ->schema([
+    Forms\Components\Textarea::make('comentarios')->label('Comentarios')->nullable(),
+    Forms\Components\Select::make('user_id')->label('Usuario')
+        ->options(User::pluck('name', 'id'))->required()
+        ->default(Filament::auth()->id())->disabled()->dehydrated(true),
+        ]),
             ]);
     }
     public static function table(Table $table): Table
     {
-        return $table
-            ->columns([
-            Tables\Columns\TextColumn::make('id')->label('Código'),
-            Tables\Columns\TextColumn::make('user.name')->label('Nombre'),
-            Tables\Columns\TextColumn::make('origen')->label('Origen'),
-            Tables\Columns\TextColumn::make('tipo_evento')->label('Tipo de Evento'),
-            Tables\Columns\TextColumn::make('created_at')->label('Fecha')->dateTime('d/m/Y'),
-            ])->defaultSort('created_at', 'desc')
-            ->filters([
-                //FILTROS PARA BUSQUEDA
-                Tables\Filters\SelectFilter::make('origen')->label('Origen')
-                ->options([
-                    'TWR' => 'TWR',
-                    'SSEI'=>'SSEI',
-                    'AVSEC'=>'AVSEC',
-                ]),
-                Tables\Filters\SelectFilter::make('tipo_evento')->label('Tipo Evento')
-                ->options([
-                    'Dispersión'=>'Dispersión',
-                    'Recogida' => 'Recogida',
-                ])
-            ])->searchable()
-            ->actions([
-            Tables\Actions\ViewAction::make(),
-            //Ventanita para las actualizaciones.
-            Tables\Actions\Action::make('actualizaciones')
-            ->label('Actualizaciones')
-            ->icon('heroicon-o-eye')
-            ->modalHeading('Actualizaciones del Reporte')
-            ->form([
-                Forms\Components\Textarea::make('actualizacion')
-                    ->label('Añadir Nueva Actualización')
-                    ->rows(4)
-                    ->required(),
-            ])
-            ->modalContent(function ($record) {
-            return view('components.actualizaciones-list', [ //Vista blade en la carpeta resources.
-            // Relación polimórfica en el modelo ReporteImpactoAviar con el modelo ActualizacionesReporte
-            'actualizaciones' => $record->actualizacionesEvento()->latest()->get(),
+    return $table
+    ->columns([
+    Tables\Columns\TextColumn::make('id')->label('Código'),
+    Tables\Columns\TextColumn::make('user.name')->label('Nombre'),
+    Tables\Columns\TextColumn::make('origen')->label('Origen'),
+    Tables\Columns\TextColumn::make('tipo_evento')->label('Tipo de Evento'),
+    Tables\Columns\TextColumn::make('created_at')->label('Fecha')->dateTime('d/m/Y'),
+    ])->defaultSort('created_at', 'desc')
+    ->filters([
+    //FILTROS PARA BUSQUEDA
+    Tables\Filters\SelectFilter::make('origen')->label('Origen')
+    ->options([
+        'TWR' => 'TWR',
+        'SSEI'=>'SSEI',
+        'AVSEC'=>'AVSEC',
+    ]),
+    Tables\Filters\SelectFilter::make('tipo_evento')->label('Tipo Evento')
+    ->options([
+        'Dispersión'=>'Dispersión',
+        'Recogida' => 'Recogida',
+    ])
+    ])->searchable()
+    ->actions([
+    Tables\Actions\ViewAction::make(),
+    //Ventanita para las actualizaciones.
+    Tables\Actions\Action::make('actualizaciones')
+    ->label('Actualizaciones')
+    ->icon('heroicon-o-eye')
+    ->modalHeading('Actualizaciones del Reporte')
+    ->form([
+    Forms\Components\Textarea::make('actualizacion')
+        ->label('Añadir Nueva Actualización')
+        ->rows(4)->required(),
+    ])
+    ->modalContent(function ($record) {
+        return view('components.actualizaciones-list', [ //Vista blade en la carpeta resources.
+        // Relación polimórfica en el modelo ReporteImpactoAviar con el modelo ActualizacionesReporte
+        'actualizaciones' => $record->actualizacionesEvento()->latest()->get(),
+        ]);
+        })
+        ->action(function ($record, array $data): void {
+            $record->actualizacionesEvento()->create([
+                'actualizacion' => $data['actualizacion'],
+                'autor' => Filament::auth()->id()
             ]);
-            })
-            ->action(function ($record, array $data): void {
-                $record->actualizacionesEvento()->create([
-                    'actualizacion' => $data['actualizacion'],
-                    'autor' => Filament::auth()->id()
-                ]);
-            }),
-            /*---------------------------Reporte en pdf-------------------------------------------------*/
-            Tables\Actions\Action::make('downloadPDF')
-                ->label('PDF')
-                ->icon('heroicon-o-arrow-down-tray')
-                ->color('danger')
-                ->url(fn($record) => route('eventoIntervenciones.pdf', $record->id))
-                // ->openUrlInNewTab(), // Esto hace que el PDF se abra en una nueva pestaña
+        }),
+/*---------------------------Reporte en pdf-------------------------------------------------*/
+    Tables\Actions\Action::make('downloadPDF')
+        ->label('PDF')
+        ->icon('heroicon-o-arrow-down-tray')
+        ->color('danger')
+        ->url(fn($record) => route('eventoIntervenciones.pdf', $record->id))
         ]);
     }
 
@@ -288,6 +256,7 @@ protected static function getWeatherData(string $city = 'Panama,PA')
         return $response->successful() ? $response->json() : null;
     });
 }
+//Funcion para los campos vistos, dispersados, sacrificados. para no volver repetitivo el codigo.
 protected static function getCantidadOptions(): array
     {
         return [
