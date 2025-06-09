@@ -13,12 +13,11 @@
 
                 if (latInput) {
                     latInput.value = lat;
-                    latInput.dispatchEvent(new Event('input')); // 🔥 esto es clave
-                }
+                    latInput.dispatchEvent(new Event('input'));
 
                 if (lngInput) {
                     lngInput.value = lng;
-                    lngInput.dispatchEvent(new Event('input')); // 🔥 esto también
+                    lngInput.dispatchEvent(new Event('input')); 
                 }
 
             }, function (error) {

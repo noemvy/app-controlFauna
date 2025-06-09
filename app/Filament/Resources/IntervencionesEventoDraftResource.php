@@ -198,7 +198,6 @@ class IntervencionesEventoDraftResource extends Resource
     ])
     ])->searchable()
     ->actions([
-    Tables\Actions\ViewAction::make(),
     //Ventanita para las actualizaciones.
     Tables\Actions\Action::make('actualizaciones')
     ->label('Actualizaciones')
