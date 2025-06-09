@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CatalogoInventarioResource\Pages;
-use App\Filament\Resources\CatalogoInventarioResource\RelationManagers;
 use App\Models\CatalogoInventario;
 use Filament\Forms;
 use Filament\Forms\Form;

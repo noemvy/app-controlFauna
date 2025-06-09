@@ -27,13 +27,8 @@ class AccionesResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('nombre')
+                Forms\Components\Select::make('Acciones')
                 ->label('Acción realizada')
-                ->options([
-                    'Recogida' => 'Recogida',
-                    'Monitoreo'=> 'Monitoreo',
-                    'Disperción' => 'Disperción'
-                ])
             ]);
     }
 

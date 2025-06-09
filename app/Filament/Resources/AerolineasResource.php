@@ -21,6 +21,7 @@ class AerolineasResource extends Resource
 
     protected static ?string $navigationLabel = 'Aerolíneas';
     protected static ?string $navigationGroup = 'Catálogos';
+    protected static ?string $modelLabel = 'Aerolíneas';
 
     public static function form(Form $form): Form
     {

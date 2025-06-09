@@ -40,9 +40,7 @@ class InventarioMunicionesResource extends Resource
                 ->label('Aeropuerto')
                 ->placeholder('Eliga el Aeropuerto al que pertenece')
                 ->options(Aerodromo::all()->pluck('nombre','id'))
-                ->required()
-                ->searchable()
-                ->preload()
+                ->required()->searchable()->preload()
                 ->reactive(),
                 Forms\Components\Select::make('catinventario_id')
                 ->label('Equipo')
@@ -60,7 +58,7 @@ class InventarioMunicionesResource extends Resource
                         $query->orWhere('id', $record->catinventario_id);
                     }
                 }
-                return $query->pluck('nombre', 'id');
+                return $query->orderBy('nombre')->pluck('nombre', 'id');
             }),
             Forms\Components\TextInput::make('cantidad_minima')
                 ->label('Cantidad Mínima')

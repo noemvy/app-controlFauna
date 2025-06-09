@@ -25,16 +25,8 @@ class AtractivosResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('nombre')
-                ->label('Atractivo para la fauna')
-                ->options([
-                    'Vertederos de basura' => 'Vertederos de basura',
-                    'Fuentes de agua estancada' => 'Fuentes de agua estancada',
-                    'Cultivos cercanos' => 'Cultivos cercanos',
-                    'Presencia de insectos' => 'Presencia de insectos',
-                    'Lagunas o ríos' => 'Lagunas o ríos',
-                    'Áreas de vegetación densa' => 'Áreas de vegetación densa',
-                ])
+                Forms\Components\TextInput::make('nombre')
+                ->label('Atractivo para la Fauna')
 
             ]);
     }

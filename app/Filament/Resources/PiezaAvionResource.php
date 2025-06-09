@@ -18,7 +18,7 @@ class PiezaAvionResource extends Resource
     protected static ?string $model = PiezaAvion::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-flag';
-
+    protected static ?string $modelLabel = 'Piezas de Avión';
     protected static ?string $navigationLabel = 'Piezas de Avión';
     protected static ?string $navigationGroup = 'Catálogos';
 

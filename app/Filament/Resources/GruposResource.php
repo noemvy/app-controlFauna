@@ -25,13 +25,8 @@ class GruposResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('nombre')
+                Forms\Components\TextInput::make('nombre')
                 ->label('Grupo de animales')
-                ->options([
-                    'Reptiles',
-                    'Mamíferos',
-                    'Aves'
-                ])
             ]);
     }
 

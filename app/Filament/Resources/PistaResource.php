@@ -22,7 +22,6 @@ class PistaResource extends Resource
 
     protected static ?string $navigationLabel = 'Pistas de Aeropuertos';
     protected static ?string $navigationGroup = 'Catálogos';
-
     public static function form(Form $form): Form
     {
         return $form
