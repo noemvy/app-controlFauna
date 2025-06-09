@@ -26,9 +26,9 @@ class IntervencionesEventoDraftResource extends Resource
     protected static ?string $model = IntervencionesEventoDraft::class;
 
     protected static ?string $navigationIcon = 'lucide-tower-control';
-    protected static ?string $navigationGroup = 'Operaciones';
-    protected static ?string $navigationLabel = "Eventos - Intervenciones";
-    protected static ?string $modelLabel = 'Eventos - Intervenciones 🚨';
+    protected static ?string $navigationGroup = 'Eventos';
+    protected static ?string $navigationLabel = "Intervenciones";
+    protected static ?string $modelLabel = 'Intervenciones 🚨';
 
 
     public static function form(Form $form): Form
