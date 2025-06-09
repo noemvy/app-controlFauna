@@ -14,15 +14,12 @@ use App\Models\User;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Filament\Forms\Components\View;
 
 class IntervencionesDraftResource extends Resource
 {
@@ -33,146 +30,112 @@ class IntervencionesDraftResource extends Resource
     {
         return $form->schema([
 /*-----------------------------------------Datos de las especies🦜--------------------------------------*/
-        Forms\Components\Section::make('Datos de la Fauna')
-            ->schema([
-        Forms\Components\Select::make('grupos_id')
-            ->label('Grupo')
-            ->options(Grupo::orderBy('nombre')->pluck('nombre', 'id'))
-            ->reactive()
-            ->required()
-            ->afterStateUpdated(fn (callable $set) => $set('especies_id', null)),
-        Forms\Components\Select::make('especies_id')
-            ->label('Especie')
-            ->options(function (callable $get) {
-                $grupoId = $get('grupos_id');
-                if (!$grupoId) {
-                    return [];
-                }
-                return Especie::where('grupos_id', $grupoId)->orderBy('nombre_cientifico')->pluck('nombre_cientifico', 'id');
-            })
-            ->searchable()
-            ->required()
-            ->disabled(fn (callable $get) => !$get('grupos_id')),
-        Forms\Components\Select::make('atractivos_id')
-            ->label('Atractivo')
-            ->options(Atractivo::pluck('nombre', 'id'))
-            ->searchable()
-            ->required(),
-        Forms\Components\Select::make('vistos')
-            ->options(self::getCantidadOptions())
-            ->label('Vistos')
-            ->placeholder('Seleccione una cantidad'),
-        Forms\Components\Select::make('sacrificados')
-            ->label('Sacrificados')
-            ->options(self::getCantidadOptions())
-            ->placeholder('Seleccione una cantidad'),
-        Forms\Components\Select::make('dispersados')
-            ->label('Dispersados')
-            ->options(self::getCantidadOptions())
-            ->placeholder('Seleccione una cantidad'),
-        Forms\Components\FileUpload::make('fotos')
-            ->label('Fotos')->multiple()
-            ->maxFiles(5)->image()
-            ->disk('public')->directory('intervenciones')
-            ->preserveFilenames()->reorderable()
-            ->nullable()->columnSpanFull(),
+    Forms\Components\Section::make('Datos de la Fauna')
+        ->schema([
+    Forms\Components\Select::make('grupos_id')
+        ->label('Grupo')
+        ->options(Grupo::orderBy('nombre')->pluck('nombre', 'id'))
+        ->reactive()->required()
+        ->afterStateUpdated(fn (callable $set) => $set('especies_id', null)),
+    Forms\Components\Select::make('especies_id')
+        ->label('Especie')
+        ->options(function (callable $get) {
+            $grupoId = $get('grupos_id');
+            if (!$grupoId) {
+                return [];
+            }
+            return Especie::where('grupos_id', $grupoId)->orderBy('nombre_cientifico')->pluck('nombre_cientifico', 'id');
+        })
+        ->searchable()->required()->disabled(fn (callable $get) => !$get('grupos_id')),
+    Forms\Components\Select::make('atractivos_id')
+        ->label('Atractivo')
+        ->options(Atractivo::pluck('nombre', 'id'))
+        ->searchable()->required(),
+    Forms\Components\Select::make('vistos')
+        ->options(self::getCantidadOptions())
+        ->label('Vistos')->placeholder('Seleccione una cantidad'),
+    Forms\Components\Select::make('sacrificados')
+        ->label('Sacrificados')
+        ->options(self::getCantidadOptions())
+        ->placeholder('Seleccione una cantidad'),
+    Forms\Components\Select::make('dispersados')
+        ->label('Dispersados')
+        ->options(self::getCantidadOptions())
+        ->placeholder('Seleccione una cantidad'),
+    Forms\Components\FileUpload::make('fotos')
+        ->label('Fotos')->multiple()
+        ->maxFiles(5)->image()
+        ->disk('public')->directory('intervenciones')
+        ->preserveFilenames()->reorderable()
+        ->nullable()->columnSpanFull(),
         ])->columns(3),
 /*-----------------------------------------Datos del clima⛅--------------------------------------------*/
-        Forms\Components\Section::make('Datos del Clima y Ubicación')
+    Forms\Components\Section::make('Datos del Clima y Ubicación')
         ->schema([
-        Forms\Components\TextInput::make('coordenada_x')
-            ->label('Coordenada X')
-            ->numeric()
-            ->step(0.000001)
-            ->disabled()
-            ->dehydrated(true)
-            ->default(fn() => data_get(static::getWeatherData(), 'coord.lat')
-                ? number_format(data_get(static::getWeatherData(), 'coord.lat'), 8, '.', '')
-                : null),
-        Forms\Components\TextInput::make('coordenada_y')
-            ->label('Coordenada Y')
-            ->numeric()
-            ->disabled()
-            ->step(0.000001)
-            ->dehydrated(true)
-            ->default(fn() => data_get(static::getWeatherData(), 'coord.lon')
-                ? number_format(data_get(static::getWeatherData(), 'coord.lon'), 8, '.', '')
-                : null),
-        Forms\Components\TextInput::make('temperatura')
-            ->label('Temperatura')
-            ->suffix('°C')
-            ->disabled()
-            ->dehydrated(true)
-            ->default(fn() => data_get(static::getWeatherData(),'main.temp')),
-        Forms\Components\TextInput::make('viento')
-            ->label('Viento')
-            ->numeric()
-            ->disabled()
-            ->dehydrated(true)
-            ->suffix('m/s')
-            ->default(fn() => data_get(static::getWeatherData(),'wind.speed')),
-        Forms\Components\TextInput::make('humedad')
-            ->label('Humedad')
-            ->suffix('%')
-            ->disabled()
-            ->dehydrated(true)
-            ->default(fn() => data_get(static::getWeatherData(),'main.humidity')),
-        ])->columns(5),
+    Forms\Components\TextInput::make('coordenada_x')
+        ->label('Coordenada X')
+        ->id('coordenada_x')
+        ->readOnly()->dehydrated(true),
+    Forms\Components\TextInput::make('coordenada_y')
+        ->label('Coordenada Y')
+        ->id('coordenada_y')
+        ->readOnly()->dehydrated(true),
+    View::make('components.get-coordenadas'),
+    Forms\Components\TextInput::make('temperatura')
+        ->label('Temperatura')
+        ->suffix('°C')
+        ->disabled()->dehydrated(true)
+        ->default(fn() => data_get(static::getWeatherData(),'main.temp')),
+    Forms\Components\TextInput::make('viento')
+        ->label('Viento')
+        ->numeric()->disabled()->dehydrated(true)->suffix('m/s')
+        ->default(fn() => data_get(static::getWeatherData(),'wind.speed')),
+    Forms\Components\TextInput::make('humedad')
+        ->label('Humedad')
+        ->suffix('%')->disabled()->dehydrated(true)
+        ->default(fn() => data_get(static::getWeatherData(),'main.humidity')),
+        ])->columns(6),
 /*----------------------------------------------------SECCIÓN PARA ESCOGER LA CANTIDAD DE MUNICIONES USADAS-------------------------------------------------- */
-        Forms\Components\Section::make('Equipo Utilizado')
-            ->schema([
-        Forms\Components\Repeater::make('municion_utilizada')
-            ->label('')
-            ->schema([
-        Forms\Components\Grid::make(4)
-            ->schema([
-        Forms\Components\Select::make('aerodromo_id')
-            ->label('Aeropuerto')
-            ->options(Aerodromo::pluck('nombre', 'id'))
-            ->required()
-            ->default(Filament::auth()->user()->aerodromo_id)
-            ->disabled()
-            ->dehydrated(true),
-        Forms\Components\Select::make('catinventario_id')
-            ->label('Herramienta Utilizada:')
-            ->options(CatalogoInventario::pluck('nombre', 'id'))
-            ->searchable()
-            ->reactive()
-            ->required()
-            ->dehydrated()
-            ->afterStateUpdated(function (callable $set, $state) {
-                $inventario = CatalogoInventario::find($state);
-                $set('acciones_id', $inventario?->acciones_id);
-                $set('es_consumible', $inventario?->es_consumible);
-            }),
-        Forms\Components\Select::make('acciones_id')
-            ->label('Tipo de Acción Realizada:')
-            ->options(Acciones::pluck('nombre', 'id'))
-            ->searchable()
-            ->required()
-            ->disabled()
-            ->dehydrated(),
-        Forms\Components\Hidden::make('es_consumible')
+    Forms\Components\Section::make('Equipo Utilizado')
+        ->schema([
+    Forms\Components\Repeater::make('municion_utilizada')
+        ->label('')
+        ->schema([
+    Forms\Components\Grid::make(4)
+        ->schema([
+    Forms\Components\Select::make('aerodromo_id')
+        ->label('Aeropuerto')->options(Aerodromo::pluck('nombre', 'id'))
+        ->required()->default(Filament::auth()->user()->aerodromo_id)
+        ->disabled()->dehydrated(true),
+    Forms\Components\Select::make('catinventario_id')
+        ->label('Herramienta Utilizada:')
+        ->options(CatalogoInventario::pluck('nombre', 'id'))
+        ->searchable()->reactive()->required()->dehydrated()
+        ->afterStateUpdated(function (callable $set, $state) {
+            $inventario = CatalogoInventario::find($state);
+            $set('acciones_id', $inventario?->acciones_id);
+            $set('es_consumible', $inventario?->es_consumible);
+        }),
+    Forms\Components\Select::make('acciones_id')
+        ->label('Tipo de Acción Realizada:')->options(Acciones::pluck('nombre', 'id'))
+        ->searchable()->required()->disabled()->dehydrated(true),
+    Forms\Components\Hidden::make('es_consumible')
         ->dehydrated(false),
-        Forms\Components\TextInput::make('cantidad_utilizada')
-            ->label('Cantidad a utilizar')
-            ->numeric()
-            ->nullable()
-            ->required(fn (callable $get) => $get('es_consumible') === 1)
-            ->visible(fn (callable $get) => $get('es_consumible') === 1),
+    Forms\Components\TextInput::make('cantidad_utilizada')
+        ->label('Cantidad a utilizar')->numeric()->nullable()
+        ->required(fn (callable $get) => $get('es_consumible') === 1)
+        ->visible(fn (callable $get) => $get('es_consumible') === 1),
             ]),
         ])->defaultItems(1)->reorderable(false)
         ])->columns(1)->columnSpanFull(),
-        /*----------------------------------Datos de comentarios y usuario--------------------------------------*/
-        Forms\Components\Section::make('Comentarios y Usuario')
-            ->schema([
-        Forms\Components\Textarea::make('comentarios')->label('Comentarios')->nullable(),
-        Forms\Components\Select::make('user_id')->label('Usuario')
-            ->options(User::pluck('name', 'id'))
-            ->required()
-            ->default(Filament::auth()->id())
-            ->disabled()
-            ->dehydrated(true),
+    /*----------------------------------Datos de comentarios y usuario--------------------------------------*/
+    Forms\Components\Section::make('Comentarios y Usuario')
+        ->schema([
+    Forms\Components\Textarea::make('comentarios')->label('Comentarios')->nullable(),
+    Forms\Components\Select::make('user_id')->label('Usuario')
+        ->options(User::pluck('name', 'id'))->required()
+        ->default(Filament::auth()->id())
+        ->disabled()->dehydrated(true),
             ])
         ]);
     }
@@ -182,15 +145,6 @@ class IntervencionesDraftResource extends Resource
         return $table
             ->columns([
                 // columnas si deseas agregar
-            ])
-            ->filters([])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
             ]);
     }
 
