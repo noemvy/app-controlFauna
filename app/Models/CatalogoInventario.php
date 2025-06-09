@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class CatalogoInventario extends Model
 {
     use HasFactory;
-    protected $fillable = ['acciones_id', 'nombre', 'categoria_equipo', 'descripcion','estado'];
+    protected $fillable = ['acciones_id', 'nombre', 'categoria_equipo','es_consumible', 'descripcion','estado'];
 
      //Relacion con las Acciones que se realizan con las municiones
     public function acciones()
