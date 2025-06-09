@@ -139,18 +139,21 @@ class IntervencionesEventoDraftResource extends Resource
         ->disabled()->dehydrated(true),
     Forms\Components\Select::make('catinventario_id')
         ->label('Herramienta Utilizada:')
-        ->options(CatalogoInventario::pluck('nombre', 'id'))->searchable()
+        ->options(CatalogoInventario::where('categoria_equipo', '!=', 'Instrumento')->pluck('nombre', 'id'))
         ->reactive()->required()->dehydrated()
         ->afterStateUpdated(function (callable $set, $state) {
             $inventario = CatalogoInventario::find($state);
             $set('acciones_id', $inventario?->acciones_id);
             $set('es_consumible', $inventario?->es_consumible);
+            $set('categoria_equipo', $inventario?->categoria_equipo);
         }),
     Forms\Components\Select::make('acciones_id')
         ->label('Tipo de Acción Realizada:')
         ->options(Acciones::pluck('nombre', 'id'))
         ->searchable()->required()->disabled()->dehydrated(true),
     Forms\Components\Hidden::make('es_consumible')
+        ->dehydrated(false),
+    Forms\Components\Hidden::make('categoria_equipo')
         ->dehydrated(false),
     Forms\Components\TextInput::make('cantidad_utilizada')
         ->label('Cantidad a utilizar')->numeric()

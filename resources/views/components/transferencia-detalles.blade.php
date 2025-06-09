@@ -17,10 +17,10 @@
     </div>
     <div>
         <strong>Usuario:</strong>
-        <div>{{ $record->user->name ?? 'Sin Usuario' }}</div>
+        <div>{{ $record->transferenciaMuniciones->usuario->name ?? 'Sin Usuario' }}</div>
     </div>
     <div>
         <strong>Comentarios:</strong>
-        <div>{{ $record->observaciones ?? 'Sin comentarios' }}</div>
+        <div>{{ $record->transferenciaMuniciones->observaciones ?? 'Sin comentarios' }}</div>
     </div>
 </div>

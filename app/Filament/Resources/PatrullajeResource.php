@@ -71,7 +71,8 @@ public static function table(Table $table): Table
     {
     return $table
     ->columns([
-        Tables\Columns\TextColumn::make('user.name')->label('Usuario'),
+        Tables\Columns\TextColumn::make('id')->label('Código'),
+        Tables\Columns\TextColumn::make('inicio')->label('Hora de Inicio'),
         Tables\Columns\TextColumn::make('inicio')->label('Hora de Inicio'),
         Tables\Columns\TextColumn::make('fin')->label('Hora de Finalización'),
     ])
