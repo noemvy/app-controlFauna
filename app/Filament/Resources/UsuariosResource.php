@@ -3,11 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UsuariosResource\Pages;
-use App\Filament\Resources\UsuariosResource\RelationManagers;
-use App\Models\Aerodromo;
-use App\Models\Departamento;
 use App\Models\User;
-use App\Models\Usuarios;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -37,17 +33,14 @@ class UsuariosResource extends Resource
                 ->label('Código de Colaborador')
                 ->unique(ignoreRecord: true)
                 ->maxLength(255),
-
             Forms\Components\Toggle::make('estado')
                 ->label('Activo')
                 ->required()
                 ->helperText('Marca si el usuario está activo.'),
-
             Forms\Components\Select::make('aerodromo_id')
                     ->label('Aeródromo')
                     ->relationship('aerodromo', 'nombre')
                     ->required(),
-
             Forms\Components\Select::make('departamento_id')
                     ->label('Departamento')
                     ->relationship('departamento', 'descripcion')
@@ -77,11 +70,6 @@ class UsuariosResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
             ]);
     }
 
