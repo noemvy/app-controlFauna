@@ -32,6 +32,8 @@ class ReporteImpactoAviar extends Model
         'fauna_observada',
         'fauna_impactada',
         'fauna_tamano',
+        'img_paths_fauna',
+        'img_paths_impacto',
         'consecuencia',
         'observacion',
         'tiempo_fs',
@@ -42,8 +44,8 @@ class ReporteImpactoAviar extends Model
         'user_id'
     ];
     protected $casts =[
-    'img_paths_fauna' => 'json',
-    'img_paths_impacto' => 'json',
+    'img_paths_fauna' => 'array',
+    'img_paths_impacto' => 'array',
     'advertencia' => 'array',
 ];
 
