@@ -14,6 +14,7 @@
                 if (latInput) {
                     latInput.value = lat;
                     latInput.dispatchEvent(new Event('input'));
+                }
 
                 if (lngInput) {
                     lngInput.value = lng;
