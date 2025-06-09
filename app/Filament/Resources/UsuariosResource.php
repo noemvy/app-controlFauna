@@ -23,7 +23,7 @@ class UsuariosResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-user';
     protected static ?string $navigationGroup = 'Usuarios';
     protected static ?string $modelLabel = 'Usuarios';
-    protected static ?int $navigationSort = 999; 
+    protected static ?int $navigationSort = 999;
     public static function form(Form $form): Form
     {
         return $form
@@ -40,6 +40,7 @@ class UsuariosResource extends Resource
 
             Forms\Components\Toggle::make('estado')
                 ->label('Activo')
+                ->required()
                 ->helperText('Marca si el usuario está activo.'),
 
             Forms\Components\Select::make('aerodromo_id')
@@ -61,9 +62,15 @@ class UsuariosResource extends Resource
             ->columns([
             Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
             Tables\Columns\TextColumn::make('email')->searchable(),
-            Tables\Columns\TextColumn::make('estado')->label('Activo'),
+            Tables\Columns\IconColumn::make('estado')->label('Activo')
+            ->boolean()
+                    ->trueIcon('heroicon-o-check-circle') // Ícono para verdadero
+                    ->falseIcon('heroicon-o-x-circle') // Ícono para falso
+                    ->trueColor('success') // Color para verdadero
+                    ->falseColor('danger')// Color para falso
+                ->searchable(),
             Tables\Columns\TextColumn::make('aerodromo.nombre')->label('Aeródromo')->sortable(),
-            Tables\Columns\TextColumn::make('departamento.nombre')->label('Departamento')->sortable(),
+            Tables\Columns\TextColumn::make('departamento.descripcion')->label('Departamento')->sortable(),
             ])->defaultSort('created_at', 'desc')
             ->filters([
                 //
