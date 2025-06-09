@@ -20,35 +20,34 @@ class ListIntervencionesEventoDrafts extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [
-            /*----------------------------BOTON DE NUEVA INTERVENCION--------------------------------*/
-            Actions\CreateAction::make('Nueva intervención')
-                ->label('Nueva Interveción'),
-            Action::make('exportReports')
-                ->label('Descargar Excel')
-                ->icon('lucide-file-x-2')
-                ->color('info')
-            ->form([
-            Forms\Components\Select::make('tipo_evento')
-            ->label('Tipo de Evento')
-            ->options([
-                'Disperción' => 'Disperción',
-                'Recogida' => 'Recogida',
-            ])
-            ->placeholder('Tipo Evento'),
-            Forms\Components\Select::make('origen')
-            ->label('Origen del Reporte')
-            ->options([
-                'TWR' => 'TWR',
-                'SSEI'=>'SSEI',
-                'AVSEC'=>'AVSEC',
-            ])
-            ->placeholder('Origen')
+    return [
+/*----------------------------BOTON DE NUEVA INTERVENCION--------------------------------*/
+    Actions\CreateAction::make('Nueva intervención')
+        ->label('Nueva Interveción'),
+    Action::make('exportReports')
+        ->label('Descargar Excel')
+        ->icon('lucide-file-x-2')
+        ->color('info')
+        ->form([
+    Forms\Components\Select::make('tipo_evento')
+        ->label('Tipo de Evento')
+        ->options([
+            'Disperción' => 'Disperción',
+            'Recogida' => 'Recogida',
         ])
-
+        ->placeholder('Tipo Evento'),
+        Forms\Components\Select::make('origen')
+        ->label('Origen del Reporte')
+        ->options([
+            'TWR' => 'TWR',
+            'SSEI'=>'SSEI',
+            'AVSEC'=>'AVSEC',
+        ])
+        ->placeholder('Origen')
+        ])
         ->action(function (array $data) {
-                    $spreadsheet = new Spreadsheet();
-                    $sheet = $spreadsheet->getActiveSheet();
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
         // Encabezados
         $headers = [
             'Codigo',
