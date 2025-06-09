@@ -23,6 +23,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'codigo_colaborador',
+        'estado',
+        'aerodromo_id',
+        'departamento_id',
+
     ];
 
     /**
@@ -63,5 +68,5 @@ class User extends Authenticatable
     {
         return true; // Permite que todos los usuarios accedan al panel
     }
-    
+
 }
