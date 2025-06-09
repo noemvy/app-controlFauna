@@ -25,7 +25,7 @@ class ReporteImpactoAviarResource extends Resource
     protected static ?string $model = ReporteImpactoAviar::class;
 
     protected static ?string $navigationIcon = 'lucide-bird';
-    protected static ?string $navigationGroup = 'Operaciones';
+    protected static ?string $navigationGroup = 'Eventos';
     protected static ?string $navigationLabel = "Eventos- Impacto con Fauna"; //Nombre en el Panel
     protected static ?string $modelLabel = "Eventos - Impacto con Fauna 🦜";
 
