@@ -201,6 +201,15 @@ class IntervencionesEventoDraftResource extends Resource
     ])
     ])->searchable()
     ->actions([
+    Tables\Actions\Action::make('ver_detalles')
+        ->label('Ver Detalles')
+        ->icon('heroicon-o-eye')
+        ->modalHeading('Detalles de la Intervención')
+        ->modalSubmitAction(false)
+        ->modalCancelActionLabel('Cerrar')
+        ->modalContent(function ($record) {
+            return view('components.eventos-detalles', compact('record'));
+        }),
     //Ventanita para las actualizaciones.
     Tables\Actions\Action::make('actualizaciones')
     ->label('Actualizaciones')
