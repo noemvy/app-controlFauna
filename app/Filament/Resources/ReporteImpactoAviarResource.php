@@ -189,9 +189,9 @@ class ReporteImpactoAviarResource extends Resource
     Forms\Components\Select::make('fauna_tamano')
         ->label('Tamaño de las Especies')
         ->options([
-            'pequeñas' => 'Pequeñas',
-            'medianas' => 'Medianas',
-            'grandes' => 'Grandes',
+            'Pequeñas' => 'Pequeñas',
+            'Medianas' => 'Medianas',
+            'Grandes' => 'Grandes',
         ]),
     Forms\Components\FileUpload::make('img_paths_fauna')
         ->label('Fotos')
@@ -281,7 +281,7 @@ class ReporteImpactoAviarResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('codigo'),
                 Tables\Columns\TextColumn::make('aerodromo.nombre')->label('Aeropuerto')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('aerolinea.nombre')->label('Aerolinea')->sortable(),
+                Tables\Columns\TextColumn::make('aerolinea.nombre')->label('Aerolínea')->sortable(),
                 Tables\Columns\TextColumn::make('fecha')
                     ->label('Fecha de Impacto')
                     ->dateTime('d/m/Y'),
@@ -293,8 +293,6 @@ class ReporteImpactoAviarResource extends Resource
                 ->relationship('aerodromo', 'nombre'),
             ])
             ->actions([
-            //Vista view
-            Tables\Actions\ViewAction::make(),
             //Ventanita para las actualizaciones.
             Tables\Actions\Action::make('actualizaciones')
             ->label('Actualizaciones')->icon('heroicon-o-eye')
