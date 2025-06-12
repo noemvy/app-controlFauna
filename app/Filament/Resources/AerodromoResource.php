@@ -18,7 +18,7 @@ class AerodromoResource extends Resource
 {
     protected static ?string $model = Aerodromo::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
+    protected static ?string $navigationIcon = 'heroicon-o-flag';
 
     protected static ?string $navigationLabel = 'Aeródromos';
     protected static ?string $navigationGroup = 'Catálogos';

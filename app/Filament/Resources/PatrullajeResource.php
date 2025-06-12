@@ -22,7 +22,7 @@ class PatrullajeResource extends Resource
 
     protected static ?string $navigationIcon = 'lucide-car-front';
     protected static ?string $navigationGroup = 'Patrullajes';
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 90;
 
     public static function form(Form $form): Form
     {

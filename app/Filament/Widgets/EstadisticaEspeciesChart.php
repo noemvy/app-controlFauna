@@ -15,7 +15,7 @@ class EstadisticaEspeciesChart extends ChartWidget
 {
     protected static ?string $heading = 'Especies Vistas';
 
-    public ?string $filter = 'all'; // Filtro activo por defecto
+    public ?string $filter = 'all';
 
     // Filtros disponibles en el widget
     protected function getFilters(): ?array

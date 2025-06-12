@@ -56,10 +56,6 @@ class PiezaAvionResource extends Resource
                     ->falseIcon('heroicon-o-x-circle') // Ícono para falso
                     ->trueColor('success') // Color para verdadero
                     ->falseColor('danger'), // Color para falso
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
 
             ])
             ->filters([

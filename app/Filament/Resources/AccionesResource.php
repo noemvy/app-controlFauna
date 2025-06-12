@@ -20,15 +20,15 @@ class AccionesResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-flag';
     protected static ?string $navigationLabel = 'Acciones';
     protected static ?string $navigationGroup = 'Catálogos';
-    protected static ?int $navigationSort = 1000;
+    protected static ?int $navigationSort = 1;
 
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('Acciones')
-                ->label('Acción realizada')
+                Forms\Components\TextInput::make('nombre')
+                ->label('Nueva Acción')
             ]);
     }
 
@@ -36,15 +36,13 @@ class AccionesResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('nombre')->label('Tipo de Acciones')->searchable()->sortable(),
-            ])
+            Tables\Columns\TextColumn::make('nombre')->label('Acciones')->searchable()->sortable(),
+            ])->defaultSort('created_at', 'desc')
             ->filters([
                 //
             ])
             ->actions([
 
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
             ]);
     }
 

@@ -225,8 +225,5 @@ class ListReporteImpactoAviars extends ListRecords
         ];
     }
 
-    public function getTitle(): string
-    {
-        return 'Reportes Impacto con Fauna'; //título
-    }
+
 }

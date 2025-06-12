@@ -29,7 +29,7 @@ class FabricanteAeronaveResource extends Resource
                 Forms\Components\TextInput::make('nombre')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('estado')
+                Forms\Components\Select::make('estado')
                     ->label('Estado')
                     ->options([
                         1 => 'Activo',
@@ -68,6 +68,7 @@ class FabricanteAeronaveResource extends Resource
             //
         ];
     }
+
 
     public static function getPages(): array
     {

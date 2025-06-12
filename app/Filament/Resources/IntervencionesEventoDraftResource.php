@@ -26,9 +26,10 @@ class IntervencionesEventoDraftResource extends Resource
     protected static ?string $model = IntervencionesEventoDraft::class;
 
     protected static ?string $navigationIcon = 'lucide-tower-control';
-    protected static ?string $navigationGroup = 'Eventos';
     protected static ?string $navigationLabel = "Intervenciones";
-    protected static ?string $modelLabel = 'Intervenciones 🚨';
+    protected static ?string $navigationGroup = 'Eventos';
+    protected static ?string $modelLabel = 'Intervenciones';
+    protected static ?int $navigationSort = 30;
 
 
     public static function form(Form $form): Form
@@ -129,6 +130,7 @@ class IntervencionesEventoDraftResource extends Resource
         ->schema([
     Forms\Components\Repeater::make('municion_utilizada')
         ->label('')
+        ->addActionLabel('Agregar Equipo') // <- Cambia el texto del botón "Añadir a"
         ->schema([
     Forms\Components\Grid::make(4) // Agrupamos en una fila de 4 columnas
         ->schema([
@@ -148,7 +150,7 @@ class IntervencionesEventoDraftResource extends Resource
             $set('categoria_equipo', $inventario?->categoria_equipo);
         }),
     Forms\Components\Select::make('acciones_id')
-        ->label('Tipo de Acción Realizada:')
+        ->label('Acción Realizada:')
         ->options(Acciones::pluck('nombre', 'id'))
         ->searchable()->required()->disabled()->dehydrated(true),
     Forms\Components\Hidden::make('es_consumible')
@@ -156,7 +158,7 @@ class IntervencionesEventoDraftResource extends Resource
     Forms\Components\Hidden::make('categoria_equipo')
         ->dehydrated(false),
     Forms\Components\TextInput::make('cantidad_utilizada')
-        ->label('Cantidad a utilizar')->numeric()
+        ->label('Cantidad Usada')->numeric()
         ->required(fn (callable $get) => $get('es_consumible') === 1)
         ->visible(fn (callable $get) => $get('es_consumible') === 1),
         ]),
@@ -203,7 +205,7 @@ class IntervencionesEventoDraftResource extends Resource
     ->actions([
     Tables\Actions\Action::make('ver_detalles')
         ->label('Ver Detalles')
-        ->icon('heroicon-o-eye')
+        ->icon('lucide-eye')
         ->modalHeading('Detalles de la Intervención')
         ->modalSubmitAction(false)
         ->modalCancelActionLabel('Cerrar')
@@ -213,7 +215,7 @@ class IntervencionesEventoDraftResource extends Resource
     //Ventanita para las actualizaciones.
     Tables\Actions\Action::make('actualizaciones')
     ->label('Actualizaciones')
-    ->icon('heroicon-o-eye')
+    ->icon('lucide-plus')
     ->modalHeading('Actualizaciones del Reporte')
     ->form([
     Forms\Components\Textarea::make('actualizacion')
@@ -235,7 +237,7 @@ class IntervencionesEventoDraftResource extends Resource
 /*---------------------------Reporte en pdf-------------------------------------------------*/
     Tables\Actions\Action::make('downloadPDF')
         ->label('PDF')
-        ->icon('heroicon-o-arrow-down-tray')
+        ->icon('lucide-arrow-down-to-line')
         ->color('danger')
         ->url(fn($record) => route('eventoIntervenciones.pdf', $record->id))
         ]);
@@ -255,18 +257,18 @@ class IntervencionesEventoDraftResource extends Resource
             'edit' => Pages\EditIntervencionesEventoDraft::route('/{record}/edit'),
         ];
     }
-protected static function getWeatherData(string $city = 'Panama,PA')
-{
-    return \Illuminate\Support\Facades\Cache::remember("weather_{$city}", now()->addMinutes(15), function () use ($city) {
-        $response = \Illuminate\Support\Facades\Http::get('https://api.openweathermap.org/data/2.5/weather', [
-            'q' => $city,
-            'appid' => env('OPENWEATHERMAP_KEY'),
-            'units' => 'metric',
-            'lang' => 'es',
-        ]);
-        return $response->successful() ? $response->json() : null;
-    });
-}
+    protected static function getWeatherData(string $city = 'Panama,PA')
+    {
+        return \Illuminate\Support\Facades\Cache::remember("weather_{$city}", now()->addMinutes(15), function () use ($city) {
+            $response = \Illuminate\Support\Facades\Http::get('https://api.openweathermap.org/data/2.5/weather', [
+                'q' => $city,
+                'appid' => env('OPENWEATHERMAP_KEY'),
+                'units' => 'metric',
+                'lang' => 'es',
+            ]);
+            return $response->successful() ? $response->json() : null;
+        });
+    }
 //Funcion para los campos vistos, dispersados, sacrificados. para no volver repetitivo el codigo.
 protected static function getCantidadOptions(): array
     {

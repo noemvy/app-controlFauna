@@ -18,7 +18,7 @@ class DestinatarioResource extends Resource
 {
     protected static ?string $model = Destinatario::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-user-group';
+    protected static ?string $navigationIcon = 'heroicon-o-flag';
 
     protected static ?string $navigationLabel = 'Destinatarios';
     protected static ?string $navigationGroup = 'Catálogos';
@@ -87,13 +87,6 @@ class DestinatarioResource extends Resource
                 Tables\Columns\TextColumn::make('correo')->label('Correo Electrónico')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('tipo')->label('Tipo')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('formulario')->label('Formulario')->searchable()->sortable(),
-                //Tables\Columns\TextColumn::make('autor')->label('Autor'),
-                Tables\Columns\TextColumn::make('aerodromos')
-                    ->label('Aeropuertos')
-                    ->formatStateUsing(
-                        fn($state, $record) =>
-                        $record->aerodromos->pluck('codigo')->join(', ')
-                    ),
                 Tables\Columns\IconColumn::make('estado')
                     ->label('Activo')
                     ->boolean()
@@ -101,11 +94,6 @@ class DestinatarioResource extends Resource
                     ->falseIcon('heroicon-o-x-circle') // Ícono para falso
                     ->trueColor('success') // Color para verdadero
                     ->falseColor('danger'), // Color para falso
-                /* Tables\Columns\TextColumn::make('created_at')
-                    ->label('Creado el')
-                    ->dateTime()
-                    ->sortable()
-                    ->dateTime('d/m/Y H:i'),*/
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('estado')

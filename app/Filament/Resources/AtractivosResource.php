@@ -19,7 +19,7 @@ class AtractivosResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-flag';
     protected static ?string $navigationGroup = 'Catálogos';
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {
@@ -36,7 +36,7 @@ class AtractivosResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')->label('Tipo de Atractivo')->searchable()->sortable(),
-            ])
+            ])->defaultSort('created_at','desc')
             ->filters([
                 //
             ]);

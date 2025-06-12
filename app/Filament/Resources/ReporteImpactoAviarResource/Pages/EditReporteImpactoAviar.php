@@ -13,7 +13,6 @@ class EditReporteImpactoAviar extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
         ];
     }
 }

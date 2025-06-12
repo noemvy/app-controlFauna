@@ -96,4 +96,12 @@ class CreateIntervencionesDraft extends CreateRecord
     {
         return route('filament.dashboard.resources.patrullajes.create');
     }
+
+    protected function getFormActions(): array
+    {
+        return [
+            $this->getCreateFormAction(), // Solo muestra el botón "Crear"
+            $this->getCancelFormAction(), // Muestra el botón "Cancelar"
+        ];
+    }
 }

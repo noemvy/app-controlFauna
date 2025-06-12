@@ -28,7 +28,7 @@ class InventarioMunicionesResource extends Resource
     protected static ?string $navigationIcon = 'lucide-package';
     protected static ?string $navigationLabel = "Inventario de Equipos";
     protected static ?string $navigationGroup = 'Inventario';
-    protected static ?int $navigationSort = 9;
+    protected static ?int $navigationSort = 999;
     protected static ?string $modelLabel = 'Inventario de Equipos';
 
 

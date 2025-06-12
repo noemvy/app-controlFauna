@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 class MunicionesChart extends ChartWidget
 {
     protected static ?string $heading = 'Municiones Usadas';
+    
 
     protected function getData(): array
     {

@@ -20,7 +20,7 @@ class GruposResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-flag';
     protected static ?string $navigationLabel = "Grupo de Animales";
     protected static ?string $navigationGroup = 'Catálogos';
-    protected static ?int $navigationSort = 999;
+    protected static ?int $navigationSort = 1;
     public static function form(Form $form): Form
     {
         return $form
@@ -35,7 +35,7 @@ class GruposResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')->label('Grupo Animal')->searchable()->sortable()
-            ])
+            ])->defaultSort('created_at', 'desc')
             ->filters([
                 //
             ]);

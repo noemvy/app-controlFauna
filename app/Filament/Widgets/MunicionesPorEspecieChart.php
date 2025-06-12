@@ -10,47 +10,74 @@ use Filament\Widgets\ChartWidget;
 class MunicionesPorEspecieChart extends ChartWidget
 {
     protected static ?string $heading = 'Municiones Utilizadas por Especie';
-
     protected function getData(): array
-    {
-    // Obtener los registros de PivoteEvento con especie
-        $datos = collect();
+{
+    $conteoMunicionesPorEspecie = collect();
+    $nombresMunicionesPorEspecie = collect();
 
-        // 🟡 EVENTOS
-        $eventos = IntervencionesEventoDraft::with(['especie', 'pivoteEvento.catalogoInventario'])->get();
+    // 🔵 EVENTOS
+    $eventos = IntervencionesEventoDraft::with(['especie', 'pivoteEvento.catalogoInventario'])->get();
 
-        foreach ($eventos as $evento) {
-            $nombreEspecie = $evento->especie?->nombre_cientifico ?? 'Sin especie';
-            $municiones = $evento->pivoteEvento->pluck('catalogoInventario.nombre')->filter()->unique()->toArray();
-            $datos[$nombreEspecie] = implode(', ', $municiones);
-        }
+    foreach ($eventos as $evento) {
+        $nombreEspecie = $evento->especie?->nombre_cientifico ?? 'Sin especie';
+        $municiones = $evento->pivoteEvento->pluck('catalogoInventario.nombre')->filter();
 
-        // 🔵 PATRULLAJES
-        $intervenciones = Intervenciones::with(['especie', 'pivote.catalogoInventario'])->get();
+        $conteo = $municiones->count();
+        $nombres = $municiones->toArray();
 
-        foreach ($intervenciones as $intervencion) {
-            $nombreEspecie = $intervencion->especie?->nombre_cientifico ?? 'Sin especie';
-            $municiones = $intervencion->pivote->pluck('catalogoInventario.nombre')->filter()->unique()->toArray();
+        $conteoMunicionesPorEspecie[$nombreEspecie] = ($conteoMunicionesPorEspecie[$nombreEspecie] ?? 0) + $conteo;
 
-            if ($datos->has($nombreEspecie)) {
-                $datos[$nombreEspecie] .= ', ' . implode(', ', $municiones);
-                $datos[$nombreEspecie] = collect(explode(', ', $datos[$nombreEspecie]))->unique()->implode(', ');
-            } else {
-                $datos[$nombreEspecie] = implode(', ', $municiones);
-            }
-        }
+        $nombresMunicionesPorEspecie[$nombreEspecie] = array_merge(
+            $nombresMunicionesPorEspecie[$nombreEspecie] ?? [],
+            $nombres
+        );
+    }
 
-        return [
+    // 🟡 PATRULLAJES
+    $intervenciones = Intervenciones::with(['especie', 'pivote.catalogoInventario'])->get();
+
+    foreach ($intervenciones as $intervencion) {
+        $nombreEspecie = $intervencion->especie?->nombre_cientifico ?? 'Sin especie';
+        $municiones = $intervencion->pivote->pluck('catalogoInventario.nombre')->filter();
+
+        $conteo = $municiones->count();
+        $nombres = $municiones->toArray();
+
+        $conteoMunicionesPorEspecie[$nombreEspecie] = ($conteoMunicionesPorEspecie[$nombreEspecie] ?? 0) + $conteo;
+
+        $nombresMunicionesPorEspecie[$nombreEspecie] = array_merge(
+            $nombresMunicionesPorEspecie[$nombreEspecie] ?? [],
+            $nombres
+        );
+    }
+
+    // Crear etiquetas y valores únicos de municiones
+    $labels = [];
+    $values = [];
+
+    foreach ($conteoMunicionesPorEspecie as $especie => $conteo) {
+        $municionesUnicas = collect($nombresMunicionesPorEspecie[$especie] ?? [])->unique()->implode(', ');
+        $labels[] = "{$especie}: {$municionesUnicas}";
+        $values[] = $conteo;
+    }
+    return [
             'datasets' => [
                 [
-                    'label' => 'Municiones utilizadas',
-                    'data' => $datos->keys()->map(fn ($key) => 1),
-                    'backgroundColor' => 'rgba(54, 162, 235, 0.6)',
+                    'label' => 'Total de municiones utilizadas',
+                    'data' => $values,
+                    'backgroundColor' => [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                        '#9966FF', '#FF9F40', '#C9CBCF',
+                    ],
+                    'borderColor' => [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                        '#9966FF', '#FF9F40', '#C9CBCF',
+                    ],
                 ],
             ],
-            'labels' => $datos->map(fn ($municiones, $especie) => "{$especie}: {$municiones}")->values()->toArray(),
+            'labels' => $labels,
         ];
-    }
+}
 
 
 
@@ -60,5 +87,7 @@ class MunicionesPorEspecieChart extends ChartWidget
     {
         return 'bar';
     }
+
+
 
 }

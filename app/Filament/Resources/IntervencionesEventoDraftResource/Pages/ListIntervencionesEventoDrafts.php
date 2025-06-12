@@ -249,6 +249,6 @@ class ListIntervencionesEventoDrafts extends ListRecords
 
     public function getTitle(): string
     {
-        return 'Reportes Evento Intervenciones'; // título
+        return 'Intervenciones';
     }
 }

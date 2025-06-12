@@ -18,11 +18,12 @@ class Dashboard extends BaseDashboard
     {
     return [
     Action::make('exportar')
-    ->label('Exportar estadísticas')
+    ->label('Exportar Estadísticas')
     ->icon('lucide-file-x-2')
     ->color('info')
     ->form([
-    Forms\Components\Section::make('Tiempo')
+    Forms\Components\Section::make('Tipo de Reporte')
+    ->description('Se genera un reporte general de la cantidad de especies vistas o municiones usadas.')
     ->schema([
     Forms\Components\Select::make('filtro_fecha')
     ->label('Especies')

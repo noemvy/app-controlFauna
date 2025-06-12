@@ -25,9 +25,8 @@ class ReporteImpactoAviarResource extends Resource
     protected static ?string $navigationIcon = 'lucide-bird';
     protected static ?string $navigationGroup = 'Eventos';
     protected static ?string $navigationLabel = "Eventos- Impacto con Fauna"; //Nombre en el Panel
-    protected static ?string $modelLabel = "Eventos - Impacto con Fauna 🦜";
-
-
+    protected static ?string $modelLabel = "Impacto con Fauna 🦜";
+    protected static ?int $navigationSort = 999;
     public static function form(Form $form): Form
     {
         return $form
@@ -121,7 +120,7 @@ class ReporteImpactoAviarResource extends Resource
             'Algunas Nubes' => 'Algunas Nubes',
             'Nublado' => 'Nublado',
             'Neblina' => 'Neblina',
-            'Lluvia' => 'Luvia'
+            'Lluvia' => 'Lluvia'
         ]),
     Forms\Components\TextInput::make('temperatura')
         ->label('Temperatura °C')
@@ -277,51 +276,52 @@ class ReporteImpactoAviarResource extends Resource
 }
     public static function table(Table $table): Table
     {
-        return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('codigo'),
-                Tables\Columns\TextColumn::make('aerodromo.nombre')->label('Aeropuerto')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('aerolinea.nombre')->label('Aerolínea')->sortable(),
-                Tables\Columns\TextColumn::make('fecha')
-                    ->label('Fecha de Impacto')
-                    ->dateTime('d/m/Y'),
-            ])->defaultSort('created_at', 'desc')
-            ->filters([
-                SelectFilter::make('aerolinea')->label('Aerolínea')
-                ->relationship('aerolinea', 'nombre'),
-                SelectFilter::make('aerodromo')->label('Aeropuerto')
-                ->relationship('aerodromo', 'nombre'),
-            ])
-            ->actions([
-            //Ventanita para las actualizaciones.
-            Tables\Actions\Action::make('actualizaciones')
-            ->label('Actualizaciones')->icon('heroicon-o-eye')
-            ->modalHeading('Actualizaciones del Reporte')
-            ->form([
-                Forms\Components\Textarea::make('actualizacion')
-                    ->label('Añadir Nueva Actualización')
-                    ->rows(4)
-                    ->required(),
-            ])
-            ->modalContent(function ($record) {
-            return view('components.actualizaciones-list', [ //Vista blade en la carpeta resources.
-            'actualizaciones' => $record->actualizaciones()->latest()->get(), // Relación polimórfica en el modelo ReporteImpactoAviar con el modelo ActualizacionesReporte
-            ]);
-            })
-            ->action(function ($record, array $data): void {
-                $record->actualizaciones()->create([
-                    'actualizacion' => $data['actualizacion'],
-                    'autor' => Filament::auth()->id(),
-                ]);
-            }),
-            /*---------------------------Reporte en pdf-------------------------------------------------*/
-            Tables\Actions\Action::make('downloadPDF')
-                ->label('PDF')
-                ->icon('heroicon-o-arrow-down-tray')
-                ->color('danger')
-                ->url(fn($record) => route('report.pdf', $record->id))
+    return $table
+    ->columns([
+    Tables\Columns\TextColumn::make('codigo'),
+    Tables\Columns\TextColumn::make('aerodromo.nombre')->label('Aeropuerto')->searchable()->sortable(),
+    Tables\Columns\TextColumn::make('aerolinea.nombre')->label('Aerolínea')->sortable(),
+    Tables\Columns\TextColumn::make('fecha')
+    ->label('Fecha de Impacto')
+    ->dateTime('d/m/Y'),
+    ])->defaultSort('created_at', 'desc')
+    ->filters([
+        SelectFilter::make('aerolinea')->label('Aerolínea')
+        ->relationship('aerolinea', 'nombre'),
+        SelectFilter::make('aerodromo')->label('Aeropuerto')
+        ->relationship('aerodromo', 'nombre'),
+    ])
+    ->actions([
+    Tables\Actions\ViewAction::make(),
+    //Ventanita para las actualizaciones.
+    Tables\Actions\Action::make('actualizaciones')
+    ->label('Actualizaciones')->icon('lucide-plus')
+    ->modalHeading('Actualizaciones del Reporte')
+    ->form([
+        Forms\Components\Textarea::make('actualizacion')
+            ->label('Añadir Nueva Actualización')
+            ->rows(4)
+            ->required(),
+    ])
+    ->modalContent(function ($record) {
+    return view('components.actualizaciones-list', [ //Vista blade en la carpeta resources.
+    'actualizaciones' => $record->actualizaciones()->latest()->get(), // Relación polimórfica en el modelo ReporteImpactoAviar con el modelo ActualizacionesReporte
+    ]);
+    })
+    ->action(function ($record, array $data): void {
+        $record->actualizaciones()->create([
+            'actualizacion' => $data['actualizacion'],
+            'autor' => Filament::auth()->id(),
         ]);
-    }
+    }),
+    /*---------------------------Reporte en pdf-------------------------------------------------*/
+    Tables\Actions\Action::make('downloadPDF')
+        ->label('PDF')
+        ->icon('lucide-arrow-down-to-line')
+        ->color('danger')
+        ->url(fn($record) => route('report.pdf', $record->id))
+]);
+}
 
     public static function getRelations(): array
     {
