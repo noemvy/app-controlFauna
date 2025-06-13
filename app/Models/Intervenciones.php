@@ -30,6 +30,7 @@ class Intervenciones extends Model
         'fotos' => 'array',
     ];
 
+
     // Relación con Especie
     public function especie()
     {
