@@ -179,12 +179,16 @@ class ReporteImpactoAviarResource extends Resource
         ->label('Especie Impactada')->placeholder('Elija una especie')
         ->options(Especie::all()->pluck('nombre_cientifico','id'))
         ->required()->searchable()->preload(),
-    Forms\Components\Select::make('fauna_impactada')
-        ->label('Cantidad de Fauna Impactada')
-        ->options(self::getCantidadOptions()),
-    Forms\Components\Select::make('fauna_observada')
-        ->label('Fauna Observada')
-        ->options(self::getCantidadOptions()),
+    Forms\Components\TextInput::make('fauna_impactada')
+        ->label('Cantidad de Fauna Impactada')->numeric()->minValue(0)
+        ->extraAttributes([
+            'onkeydown' => "if(['e','E','+','-'].includes(event.key)){event.preventDefault();}",
+        ]),
+    Forms\Components\TextInput::make('fauna_observada')
+        ->label('Fauna Observada')->numeric()->minValue(0)
+        ->extraAttributes([
+            'onkeydown' => "if(['e','E','+','-'].includes(event.key)){event.preventDefault();}",
+        ]),
     Forms\Components\Select::make('fauna_tamano')
         ->label('Tamaño de las Especies')
         ->options([

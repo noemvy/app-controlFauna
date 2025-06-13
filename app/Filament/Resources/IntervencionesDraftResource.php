@@ -51,17 +51,21 @@ class IntervencionesDraftResource extends Resource
         ->label('Atractivo')
         ->options(Atractivo::pluck('nombre', 'id'))
         ->searchable()->required(),
-    Forms\Components\Select::make('vistos')
-        ->options(self::getCantidadOptions())
-        ->label('Vistos')->placeholder('Seleccione una cantidad'),
-    Forms\Components\Select::make('sacrificados')
-        ->label('Sacrificados')
-        ->options(self::getCantidadOptions())
-        ->placeholder('Seleccione una cantidad'),
-    Forms\Components\Select::make('dispersados')
-        ->label('Dispersados')
-        ->options(self::getCantidadOptions())
-        ->placeholder('Seleccione una cantidad'),
+    Forms\Components\TextInput::make('vistos')
+        ->label('Vistos')->placeholder('Seleccione una cantidad')->numeric()->minValue(0)
+        ->extraAttributes([
+            'onkeydown' => "if(['e','E','+','-'].includes(event.key)){event.preventDefault();}",
+        ]),
+    Forms\Components\TextInput::make('dispersados')
+        ->label('Dispersados') ->placeholder('Seleccione una cantidad')->numeric()->minValue(0)
+        ->extraAttributes([
+            'onkeydown' => "if(['e','E','+','-'].includes(event.key)){event.preventDefault();}",
+        ]),
+    Forms\Components\TextInput::make('sacrificados')
+        ->label('Sacrificados')->placeholder('Seleccione una cantidad')->numeric()->minValue(0)
+        ->extraAttributes([
+            'onkeydown' => "if(['e','E','+','-'].includes(event.key)){event.preventDefault();}",
+        ]),
     Forms\Components\FileUpload::make('fotos')
         ->label('Fotos')->multiple()
         ->maxFiles(5)->image()
@@ -185,25 +189,25 @@ class IntervencionesDraftResource extends Resource
         });
     }
 
-    protected static function getCantidadOptions(): array
-    {
-        return [
-            '0' => '0 (0)',
-            '1' => '1 (1)',
-            '2' => '2 (2)',
-            '3' => '3 (3)',
-            '4' => '4 (4)',
-            '5' => '5 (5)',
-            '6' => '6 (6)',
-            '7' => '7 (7)',
-            '8' => '8 (8)',
-            '9' => '9 (9)',
-            '10' => '10 (10)',
-            '15 (11–20)' => '15 (11–20)',
-            '25 (21–30)' => '25 (21–30)',
-            '35 (31–40)' => '35 (31–40)',
-            '45 (41–50)' => '45 (41–50)',
-            '63 (51–75)' => '63 (51–75)',
-        ];
-    }
+    // protected static function getCantidadOptions(): array
+    // {
+    //     return [
+    //         '0' => '0 (0)',
+    //         '1' => '1 (1)',
+    //         '2' => '2 (2)',
+    //         '3' => '3 (3)',
+    //         '4' => '4 (4)',
+    //         '5' => '5 (5)',
+    //         '6' => '6 (6)',
+    //         '7' => '7 (7)',
+    //         '8' => '8 (8)',
+    //         '9' => '9 (9)',
+    //         '10' => '10 (10)',
+    //         '15 (11–20)' => '15 (11–20)',
+    //         '25 (21–30)' => '25 (21–30)',
+    //         '35 (31–40)' => '35 (31–40)',
+    //         '45 (41–50)' => '45 (41–50)',
+    //         '63 (51–75)' => '63 (51–75)',
+    //     ];
+    // }
 }
