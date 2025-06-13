@@ -24,9 +24,9 @@ return new class extends Migration
             $table->float('humedad')->nullable();
             $table->foreignId('especies_id')->constrained('especies')->onDelete('cascade');
             $table->foreignId('atractivos_id')->constrained('atractivos')->onDelete('cascade');
-            $table->string('vistos')->nullable();
-            $table->string('sacrificados')->nullable();
-            $table->string('dispersados')->nullable();
+            $table->integer('vistos')->nullable();
+            $table->integer('sacrificados')->nullable();
+            $table->integer('dispersados')->nullable();
             $table->json('fotos')->nullable();
             $table->text('comentarios')->nullable();
             $table->timestamps();
