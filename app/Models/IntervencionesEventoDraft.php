@@ -12,7 +12,6 @@ class IntervencionesEventoDraft extends Model
         'user_id',
         'tipo_evento',
         'origen',
-        'estado',
         'coordenada_x',
         'coordenada_y',
         'temperatura',
