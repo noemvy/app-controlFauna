@@ -88,12 +88,11 @@ return [
 
 
 
-//     'middleware' => [
-//     'auth' => [
-//         // Aquí agregas tu middleware
-//         \App\Http\Middleware\RedirectToPatrullajeEnProceso::class,
-//     ],
-// ],
+    'middleware' => [
+    'auth' => [
+        
+    ],
+],
 
 
 ];
