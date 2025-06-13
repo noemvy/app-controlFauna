@@ -1,54 +1,61 @@
-<div class="bg-white p-6 text-gray-700 text-sm">
-    <div class="grid grid-cols-2 gap-x-6 gap-y-4">
+@extends('layouts.app')
 
-        <div>
-            <strong class="text-gray-600">Tipo de Evento:</strong>
-            <div>{{ $record->tipo_evento ?? 'N/A' }}</div>
-        </div>
+@section('content')
 
-        <div>
-            <strong class="text-gray-600">Origen del Reporte:</strong>
-            <div>{{ $record->origen ?? 'N/A' }}</div>
-        </div>
-
-        <div>
-            <strong class="text-gray-600">Especie:</strong>
-            <div>{{ $record->especie->nombre_cientifico }}</div>
-        </div>
-
-        <div>
-            <strong class="text-gray-600">Atractivo para la Fauna:</strong>
-            <div>{{ $record->atractivo->nombre }}</div>
-        </div>
-
-        <div>
-            <strong class="text-gray-600">Cantidad Vista:</strong>
-            <div>{{ $record->vistos ?? 0 }}</div>
-        </div>
-
-        <div>
-            <strong class="text-gray-600">Cantidad Dispersada:</strong>
-            <div>{{ $record->dispersados ?? 0 }}</div>
-        </div>
-
-        <div>
-            <strong class="text-gray-600">Cantidad Sacrificada:</strong>
-            <div>{{ $record->sacrificados }}</div>
-        </div>
-
-        <div>
-            <strong class="text-gray-600">Herramienta Usada:</strong>
-            <div class="space-y-1 mt-1">
-                @foreach ($record->pivoteEvento as $pivote)
-                    <div class="bg-gray-100 px-2 py-1 rounded">{{ $pivote->catalogoInventario->nombre }}</div>
-                @endforeach
-            </div>
-        </div>
-
-        <div class="col-span-2">
-            <strong class="text-gray-600">Comentarios:</strong>
-            <div class="mt-1 italic text-gray-800">{{ $record->comentarios ?? 'Sin comentarios' }}</div>
-        </div>
-
+<div class="w-full p-4 text-sm text-gray-700">
+    <div class="border border-green-900 rounded-md overflow-hidden w-full">
+        <table class="w-full border-collapse table-auto">
+            <tbody>
+                <tr class="bg-green-900 text-white">
+                    <th class="p-2 border border-green-800 w-1/3">Tipo de Evento</th>
+                    <td class="p-2 border border-green-800">{{ $record->tipo_evento ?? 'N/A' }}</td>
+                </tr>
+                <tr>
+                    <th class="p-2 border border-green-100 bg-green-50 text-green-900">Origen del Reporte</th>
+                    <td class="p-2 border border-green-100">{{ $record->origen ?? 'N/A' }}</td>
+                </tr>
+                <tr>
+                    <th class="p-2 border border-green-100 bg-green-50 text-green-900">Especie</th>
+                    <td class="p-2 border border-green-100">{{ $record->especie->nombre_cientifico }}</td>
+                </tr>
+                <tr>
+                    <th class="p-2 border border-green-100 bg-green-50 text-green-900">Atractivo para la Fauna</th>
+                    <td class="p-2 border border-green-100">{{ $record->atractivo->nombre }}</td>
+                </tr>
+                <tr>
+                    <th class="p-2 border border-green-100 bg-green-50 text-green-900">Cantidad Vista</th>
+                    <td class="p-2 border border-green-100">{{ $record->vistos ?? 0 }}</td>
+                </tr>
+                <tr>
+                    <th class="p-2 border border-green-100 bg-green-50 text-green-900">Cantidad Dispersada</th>
+                    <td class="p-2 border border-green-100">{{ $record->dispersados ?? 0 }}</td>
+                </tr>
+                <tr>
+                    <th class="p-2 border border-green-100 bg-green-50 text-green-900">Cantidad Sacrificada</th>
+                    <td class="p-2 border border-green-100">{{ $record->sacrificados }}</td>
+                </tr>
+                <tr>
+                    <th class="p-2 border border-green-100 bg-green-50 text-green-900 align-top">Herramienta Usada</th>
+                    <td class="p-2 border border-green-100">
+                        <div class="space-y-1">
+                            @foreach ($record->pivoteEvento as $pivote)
+                                <div class="bg-green-100 text-green-900 px-2 py-0.5 rounded text-xs">
+                                    {{ $pivote->catalogoInventario->nombre }}
+                                </div>
+                            @endforeach
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="p-2 border border-green-100 bg-green-50 text-green-900 align-top">Comentarios</th>
+                    <td class="p-2 border border-green-100 italic">
+                        {{ $record->comentarios ?? 'Sin comentarios' }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>
+
+
+@endsection
